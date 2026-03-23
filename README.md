@@ -1,6 +1,6 @@
 <p align="center">
     <img src="http://www.cmsrs.pl/images/cms/logo_cmsrs.png"><br/>
-    CMS, gallery, and shop based on Laravel and Vue.js
+    Modern CMS for websites and galleries, and even stores, without the chaos.
 </p>
 </br>
 <p align="center">
