@@ -6,13 +6,13 @@
 <p align="center">
 <a href="https://github.com/vuejs/"><img src="https://img.shields.io/badge/Vue.js-3-yellowgreen"></a>
 <a href="https://www.cmsrs.pl/en/cms/cmsrs/coverage-test"><img src="https://img.shields.io/badge/coverage-90%25-yellowgreen"></a>
-<a href="https://github.com/cmsrs/cmsrs3/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green"></a>
+<a href="https://github.com/cmsrs/cmsrs-laravel/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green"></a>
 </p>
 </br>
 </br>
 
 
-# cmsrs3-vuejs
+# cmsrs-vuejs
 
 ### Prepare configuration
 
@@ -81,4 +81,4 @@ npm run format
 ```
 
 ### Server code 
-https://github.com/cmsrs/cmsrs3
+https://github.com/cmsrs/cmsrs-laravel
