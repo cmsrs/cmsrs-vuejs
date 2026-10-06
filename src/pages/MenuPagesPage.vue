@@ -447,7 +447,7 @@ import {
   deletePage,
   setPagePosition,
 } from "../api/apiCalls";
-import { Ckeditor } from "@ckeditor/ckeditor5-vue";
+import CKEditor from "@ckeditor/ckeditor5-vue";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 import PageTitle from "../components/PageTitle.vue";
@@ -503,7 +503,8 @@ const currentPageId = ref(false);
 const editor = ref(ClassicEditor);
 const editorConfig = ref({});
 
-const ckeditor = Ckeditor;
+editor.value = ClassicEditor;
+const ckeditor = CKEditor.component;
 
 // Computed
 //const SERVER_URL = computed(() => SERVER_URL);
