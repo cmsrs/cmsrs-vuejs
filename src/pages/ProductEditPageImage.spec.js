@@ -267,7 +267,7 @@ describe("Product edit or add images", () => {
         expect(counterUpload).toBe(2);
 
         const successMsg = trans.ttt("success_images_upload"); // "Images have been uploaded";
-        screen.findByText(successMsg);
+        screen.getByText(successMsg);
       });
     });
 

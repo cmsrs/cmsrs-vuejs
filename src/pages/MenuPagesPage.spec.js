@@ -1321,7 +1321,7 @@ describe("Pages page", () => {
         expect(counterUpload).toBe(2);
 
         const successMsg = trans.ttt("success_images_upload"); // "Images has been uploaded";
-        screen.findByText(successMsg);
+        screen.getByText(successMsg);
       });
     });
 
