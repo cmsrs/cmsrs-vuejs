@@ -16,6 +16,8 @@ import { HttpResponse, http } from "msw";
 import userEvent from "@testing-library/user-event";
 import { afterAll, beforeAll } from "vitest";
 import { API_SECRET } from "./config.js";
+import axios from "axios";
+
 const apiSecret = API_SECRET ? "/" + API_SECRET : "";
 
 const successMsgToggle = "Cache enabled";
@@ -29,6 +31,10 @@ let responseToggle = {
 
 let counterToggle = 0;
 let counter = 0;
+
+let pagesRequestCount = 0;
+let menusRequestCount = 0;
+
 let server = setupServer(
   http.post("/api" + apiSecret + "/config/toggle-cache-enable-file", () => {
     counterToggle += 1;
@@ -46,6 +52,7 @@ let server = setupServer(
   }),
 
   http.get("/api" + apiSecret + "/pages", async () => {
+    pagesRequestCount += 1;
     const jsonRes = {
       success: true,
       data: [],
@@ -55,6 +62,7 @@ let server = setupServer(
   }),
 
   http.get("/api" + apiSecret + "/menus", async () => {
+    menusRequestCount += 1;
     const jsonRes = {
       success: true,
       data: [],
@@ -65,12 +73,15 @@ let server = setupServer(
 );
 
 beforeAll(() => {
-  server.listen();
+  //server.listen();
+  server.listen({ onUnhandledRequest: "error" });
 });
 
 beforeEach(() => {
   counter = 0;
   counterToggle = 0;
+  pagesRequestCount = 0;
+  menusRequestCount = 0;
   server.resetHandlers();
 });
 
@@ -98,9 +109,9 @@ const setupStorage = async () => {
 };
 
 const setup = async (path) => {
-  router.push(path);
+  await router.push(path);
   await router.isReady();
-  render(App);
+  return render(App);
 };
 
 describe("sign out", () => {
@@ -113,12 +124,17 @@ describe("sign out", () => {
   it("click sign out link", async () => {
     setupStorage();
     await setup("/pages");
+
     const { token } = functions.retrieveParamsFromStorage();
     expect(token).not.toBe(0);
+
     const linkSignOut = await screen.findByRole("link_sign_out");
+
     expect(counter).toBe(0);
     expect(router.currentRoute.value.path).toBe("/pages");
+
     await userEvent.click(linkSignOut);
+
     await waitFor(() => {
       expect(counter).toBe(1);
       const { token } = functions.retrieveParamsFromStorage();
@@ -211,15 +227,75 @@ describe("change cache in nav bar for demo version", () => {
 });
 
 describe("prevent redirect when user is auth", () => {
+
+  it("MSW intercepts menus", async () => {
+    const response = await fetch(
+      "http://localhost:3000/api/menus?token=test"
+    );
+
+    expect(response.ok).toBe(true);
+
+    const data = await response.json();
+
+    expect(data).toEqual({
+      success: true,
+      data: [],
+    });
+  });
+
+  it("MSW intercepts axios", async () => {
+    const response = await axios.get(
+      "http://localhost:3000/api/menus?token=test"
+    );
+
+    expect(response.status).toBe(200);
+
+    expect(response.data).toEqual({
+      success: true,
+      data: [],
+    });
+  });
+
+  it("MSW intercepts axios relative URL", async () => {
+    const response = await axios.get("/api/menus?token=test");
+
+    expect(response.status).toBe(200);
+
+    expect(response.data).toEqual({
+      success: true,
+      data: [],
+    });
+  });  
+  
+
+
+
   it("prevent redirect to login page when user is auth", async () => {
     setupStorage();
-    await setup("/");
+    const { result } = await setup("/");
+
     const { token } = functions.retrieveParamsFromStorage();
+
     expect(token).not.toBe(0);
 
+    await screen.findByTestId("pages-page");
+
     await waitFor(() => {
-      expect(screen.queryByTestId("pages-page")).toBeInTheDocument();
+      //expect(screen.queryByTestId("pages-page")).toBeInTheDocument();
       expect(router.currentRoute.value.path).toBe("/pages");
     });
+
+    await waitFor(() => {
+      expect(counter).toBe(0);
+    });    
+
+    await waitFor(() => {
+      expect(pagesRequestCount).toBe(1);
+    });    
+
+    await waitFor(() => {
+      expect(menusRequestCount).toBe(1);
+    });    
+
   });
 });
