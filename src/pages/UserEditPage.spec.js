@@ -109,7 +109,7 @@ describe("User edit page", () => {
       await setupEdit();
       const header = screen.queryByRole("heading", { name: "Edit client" });
       expect(header).toBeInTheDocument();
-      await waitForAjax();      
+      await waitForAjax();
     });
 
     it("has add client header", async () => {

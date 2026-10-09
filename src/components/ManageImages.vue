@@ -176,40 +176,39 @@ async function handleUploadFile(event) {
 
   let uploadStatus = false;
   for (let i = 0; i < newImages.length; i++) {
-      let ret = await  uploadImage(
-        newImages[i],
-        props.type,
-        props.currentId,
-        auth.token,
-      );
+    let ret = await uploadImage(
+      newImages[i],
+      props.type,
+      props.currentId,
+      auth.token,
+    );
 
-      if (auth.token !== jsonStoreTest.getTestToken()) {
-        //console.log(jsonStoreTest.getTestToken()+'----------'+ auth.token );
-        await functions.delay(6000); //in test we not execute this line//test token = 'abcde12345'
-      }
+    if (auth.token !== jsonStoreTest.getTestToken()) {
+      //console.log(jsonStoreTest.getTestToken()+'----------'+ auth.token );
+      await functions.delay(6000); //in test we not execute this line//test token = 'abcde12345'
+    }
 
-      if (ret.data.success) {
-        uploadStatus = true;
-        internalMsgGood.value =
-          "Please wait. Images have been uploaded " +
-          (i + 1) +
-          "/" +
-          newImages.length;
-      }else{
-        internalMsgWrong.value = ret.data.error;
-      }
+    if (ret.data.success) {
+      uploadStatus = true;
+      internalMsgGood.value =
+        "Please wait. Images have been uploaded " +
+        (i + 1) +
+        "/" +
+        newImages.length;
+    } else {
+      internalMsgWrong.value = ret.data.error;
+    }
 
     // }catch (error) {
     //   console.log('wrong upload');
     //   handleError(error, config.demo_status, internalMsgWrong, internalPreLoader);
     // }
-    
   }
 
   const dbImages = await getImagesByCurrentId();
-  if (dbImages.data.success ) {
+  if (dbImages.data.success) {
     internalImages.value = dbImages.data.data;
-    if( uploadStatus ){
+    if (uploadStatus) {
       internalMsgGood.value = trans.ttt("success_images_upload"); //  "Images have been uploaded";
     }
     internalPreLoader.value = false;

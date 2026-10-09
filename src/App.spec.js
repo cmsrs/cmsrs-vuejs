@@ -227,11 +227,8 @@ describe("change cache in nav bar for demo version", () => {
 });
 
 describe("prevent redirect when user is auth", () => {
-
   it("MSW intercepts menus", async () => {
-    const response = await fetch(
-      "http://localhost:3000/api/menus?token=test"
-    );
+    const response = await fetch("http://localhost:3000/api/menus?token=test");
 
     expect(response.ok).toBe(true);
 
@@ -245,7 +242,7 @@ describe("prevent redirect when user is auth", () => {
 
   it("MSW intercepts axios", async () => {
     const response = await axios.get(
-      "http://localhost:3000/api/menus?token=test"
+      "http://localhost:3000/api/menus?token=test",
     );
 
     expect(response.status).toBe(200);
@@ -265,10 +262,7 @@ describe("prevent redirect when user is auth", () => {
       success: true,
       data: [],
     });
-  });  
-  
-
-
+  });
 
   it("prevent redirect to login page when user is auth", async () => {
     setupStorage();
@@ -287,15 +281,14 @@ describe("prevent redirect when user is auth", () => {
 
     await waitFor(() => {
       expect(counter).toBe(0);
-    });    
+    });
 
     await waitFor(() => {
       expect(pagesRequestCount).toBe(1);
-    });    
+    });
 
     await waitFor(() => {
       expect(menusRequestCount).toBe(1);
-    });    
-
+    });
   });
 });
