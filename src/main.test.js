@@ -1,10 +1,13 @@
-import "./main.js";
+import { beforeEach, describe, expect, it } from "vitest";
 
 describe("Main.js", () => {
-  it("attache main", async () => {
-    document.body.innerHTML = '<div id="app">' + "</div>";
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="app"></div>';
+  });
 
-    const pElement = document.getElementById("app");
-    expect(pElement).toBeTruthy();
+  it("mounts the application", async () => {
+    await import("./main.js");
+
+    expect(document.getElementById("app").innerHTML).not.toBe("");
   });
 });

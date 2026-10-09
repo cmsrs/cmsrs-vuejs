@@ -1,6 +1,7 @@
 #run all test
 if [ "$1" = "all" ]; then
-    npm run test
+    #npm run test
+    npx vitest run --mode test
     exit
 
 elif [ "$1" = "coverage" ]; then
