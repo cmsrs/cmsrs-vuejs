@@ -50,7 +50,7 @@
               </div>
 
               <!-- Entity type -->
-              <div v-if="tagEntityTypes.length > 1"  class="form-group col-4">
+              <div v-if="tagEntityTypes.length > 1" class="form-group col-4">
                 <select
                   class="form-control"
                   :class="{
@@ -141,9 +141,9 @@
           </div>
 
           <!-- New category form -->
-          <div 
-            v-if="isAddCategory" 
-            class="container mt-3" 
+          <div
+            v-if="isAddCategory"
+            class="container mt-3"
             style="margin-left: 0px; padding-left: 0px"
             data-testid="new-category-form"
           >
@@ -160,7 +160,7 @@
                 />
               </div>
 
-              <div  v-if="tagEntityTypes.length > 1"   class="form-group col-4">
+              <div v-if="tagEntityTypes.length > 1" class="form-group col-4">
                 <select
                   class="form-control"
                   v-model="newCategory.entity_type"
@@ -183,6 +183,7 @@
                   class="far fa-save cursor-pointer"
                   :class="{ 'disabled-if-loader': pre_loader }"
                   title="Save category"
+                  role="button_save_tag_category"
                   @click="saveCategory('new')"
                 ></i>
               </div>
@@ -337,7 +338,6 @@ const categoryErrors = ref({});
 const tagEntityTypes = Array.isArray(config.tag_entity_types)
   ? config.tag_entity_types
   : [];
-
 
 // --------------------------------------------------
 // Common helpers

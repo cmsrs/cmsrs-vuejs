@@ -1,8 +1,4 @@
-import {
-  render,
-  screen,
-  waitFor,
-} from "../../test/helper.js";
+import { render, screen, waitFor } from "../../test/helper.js";
 
 import "../../test/afterlogin.js";
 
@@ -115,37 +111,32 @@ const server = setupServer(
     });
   }),
 
-  http.put(
-    apiUrl + "/tag-categories/:id",
-    async ({ request, params }) => {
-      counterPutCategory += 1;
-      lastCategoryRequest = await request.json();
+  http.put(apiUrl + "/tag-categories/:id", async ({ request, params }) => {
+    counterPutCategory += 1;
+    lastCategoryRequest = await request.json();
 
-      const id = Number(params.id);
+    const id = Number(params.id);
 
-      categories = categories.map((category) =>
-        category.id === id
-          ? {
-              ...category,
-              ...lastCategoryRequest,
-            }
-          : category,
-      );
+    categories = categories.map((category) =>
+      category.id === id
+        ? {
+            ...category,
+            ...lastCategoryRequest,
+          }
+        : category,
+    );
 
-      return HttpResponse.json({
-        success: true,
-      });
-    },
-  ),
+    return HttpResponse.json({
+      success: true,
+    });
+  }),
 
   http.delete(apiUrl + "/tag-categories/:id", ({ params }) => {
     counterDeleteCategory += 1;
 
     const id = Number(params.id);
 
-    categories = categories.filter(
-      (category) => category.id !== id,
-    );
+    categories = categories.filter((category) => category.id !== id);
 
     return HttpResponse.json({
       success: true,
@@ -175,28 +166,25 @@ const server = setupServer(
     });
   }),
 
-  http.put(
-    apiUrl + "/tags/:id",
-    async ({ request, params }) => {
-      counterPutTag += 1;
-      lastTagRequest = await request.json();
+  http.put(apiUrl + "/tags/:id", async ({ request, params }) => {
+    counterPutTag += 1;
+    lastTagRequest = await request.json();
 
-      const id = Number(params.id);
+    const id = Number(params.id);
 
-      tags = tags.map((tag) =>
-        tag.id === id
-          ? {
-              ...tag,
-              ...lastTagRequest,
-            }
-          : tag,
-      );
+    tags = tags.map((tag) =>
+      tag.id === id
+        ? {
+            ...tag,
+            ...lastTagRequest,
+          }
+        : tag,
+    );
 
-      return HttpResponse.json({
-        success: true,
-      });
-    },
-  ),
+    return HttpResponse.json({
+      success: true,
+    });
+  }),
 
   http.delete(apiUrl + "/tags/:id", ({ params }) => {
     counterDeleteTag += 1;
@@ -268,9 +256,7 @@ const setup = async () => {
   render(TagsPage);
 
   await waitFor(() => {
-    expect(
-      screen.getByTestId("tags-page"),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId("tags-page")).toBeInTheDocument();
   });
 
   await waitForInitialData();
@@ -283,17 +269,14 @@ const waitForInitialData = async () => {
 };
 
 const getCategoryContainer = (id) => {
-  const container = document.querySelector(
-    `[data-category-id="${id}"]`,
-  );
+  const container = document.querySelector(`[data-category-id="${id}"]`);
 
   expect(container).not.toBeNull();
 
   return container;
 };
 
-const getNewCategoryForm = () =>
-  screen.getByTestId("new-category-form");
+const getNewCategoryForm = () => screen.getByTestId("new-category-form");
 
 const getNewCategoryInput = (lang = "en") => {
   const form = getNewCategoryForm();
@@ -334,17 +317,16 @@ describe("Tags page - initialization", () => {
     expect(screen.getByText("T-Shirts")).toBeInTheDocument();
     expect(screen.getByText("Red")).toBeInTheDocument();
 
+    expect(screen.getByText("Product type")).toBeInTheDocument();
+    expect(screen.getByText("Color")).toBeInTheDocument();
+
     const firstCategory = getCategoryContainer(1);
 
     expect(
-      firstCategory.querySelector(
-        'input[placeholder="Category name en"]',
-      ),
+      firstCategory.querySelector('input[placeholder="Category name en"]'),
     ).toBeInTheDocument();
 
-    expect(
-      screen.getByPlaceholderText("Tag name en"),
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Tag name en")).toBeInTheDocument();
   });
 
   it("displays tags under their respective categories", async () => {
@@ -377,13 +359,9 @@ describe("Tags page - add category", () => {
   it("opens the new category form", async () => {
     await setup();
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag_category"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag_category"));
 
-    expect(
-      screen.getByText("New category"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("New category")).toBeInTheDocument();
 
     expect(getNewCategoryInput("en")).toBeInTheDocument();
   });
@@ -391,27 +369,21 @@ describe("Tags page - add category", () => {
   it("creates a category with translations", async () => {
     await setup();
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag_category"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag_category"));
 
-    await userEvent.type(
-      getNewCategoryInput("en"),
-      "Material",
-    );
+    const englishInput = getNewCategoryInput("en");
 
-    // Zmieniamy język, aby wprowadzić drugie tłumaczenie.
+    await userEvent.type(englishInput, "Material");
+
+    // Switch to Polish to enter the Polish translation.
     await changeLanguage("pl");
 
     const polishInput = getNewCategoryInput("pl");
 
-    await userEvent.type(polishInput, "Materiał");
+    await userEvent.type(polishInput, "Materiall");
 
     await userEvent.click(
-      getNewCategoryForm().querySelector(
-        '[role="button_save_tag_category"]',
-      ) ??
-        screen.getAllByRole("button_save_tag_category").at(-1),
+      getNewCategoryForm().querySelector('[role="button_save_tag_category"]'),
     );
 
     await waitFor(() => {
@@ -422,7 +394,7 @@ describe("Tags page - add category", () => {
       entity_type: "product",
       name: {
         en: "Material",
-        pl: "Materiał",
+        pl: "Materiall",
       },
     });
   });
@@ -430,9 +402,7 @@ describe("Tags page - add category", () => {
   it("does not send a request when category name is empty", async () => {
     await setup();
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag_category"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag_category"));
 
     await userEvent.click(
       screen.getAllByRole("button_save_tag_category").at(-1),
@@ -440,38 +410,25 @@ describe("Tags page - add category", () => {
 
     expect(counterPostCategory).toBe(0);
 
-    expect(
-      getNewCategoryInput("en"),
-    ).toHaveClass("is-invalid");
+    expect(getNewCategoryInput("en")).toHaveClass("is-invalid");
   });
 
   it("does not send a request when category entity type is empty", async () => {
     await setup();
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag_category"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag_category"));
 
-    await userEvent.type(
-      getNewCategoryInput("en"),
-      "Material",
-    );
+    await userEvent.type(getNewCategoryInput("en"), "Material");
 
     await changeLanguage("pl");
 
-    await userEvent.type(
-      getNewCategoryInput("pl"),
-      "Materiał",
-    );
+    await userEvent.type(getNewCategoryInput("pl"), "Materiał");
 
     const form = getNewCategoryForm();
 
-    const entityTypeSelect = Array.from(
-      form.querySelectorAll("select"),
-    ).find((select) =>
-      Array.from(select.options).some(
-        (option) => option.value === "product",
-      ),
+    const entityTypeSelect = Array.from(form.querySelectorAll("select")).find(
+      (select) =>
+        Array.from(select.options).some((option) => option.value === "product"),
     );
 
     expect(entityTypeSelect).toBeDefined();
@@ -488,21 +445,13 @@ describe("Tags page - add category", () => {
   it("closes the new category form when cancel is clicked", async () => {
     await setup();
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag_category"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag_category"));
 
-    expect(
-      screen.getByText("New category"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("New category")).toBeInTheDocument();
 
-    await userEvent.click(
-      screen.getByTitle("Cancel"),
-    );
+    await userEvent.click(screen.getByTitle("Cancel"));
 
-    expect(
-      screen.queryByText("New category"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("New category")).not.toBeInTheDocument();
   });
 });
 
@@ -521,9 +470,7 @@ describe("Tags page - edit category", () => {
     await userEvent.type(input, "Footwear");
 
     await userEvent.click(
-      category.querySelector(
-        '[role="button_save_tag_category"]',
-      ),
+      category.querySelector('[role="button_save_tag_category"]'),
     );
 
     await waitFor(() => {
@@ -548,9 +495,7 @@ describe("Tags page - edit category", () => {
     await userEvent.clear(input);
 
     await userEvent.click(
-      category.querySelector(
-        '[role="button_save_tag_category"]',
-      ),
+      category.querySelector('[role="button_save_tag_category"]'),
     );
 
     expect(counterPutCategory).toBe(0);
@@ -565,9 +510,7 @@ describe("Tags page - edit category", () => {
     const category = getCategoryContainer(2);
 
     await userEvent.click(
-      category.querySelector(
-        '[role="button_delete_tag_category"]',
-      ),
+      category.querySelector('[role="button_delete_tag_category"]'),
     );
 
     await waitFor(() => {
@@ -575,9 +518,7 @@ describe("Tags page - edit category", () => {
     });
 
     await waitFor(() => {
-      expect(
-        document.querySelector('[data-category-id="2"]'),
-      ).toBeNull();
+      expect(document.querySelector('[data-category-id="2"]')).toBeNull();
     });
   });
 
@@ -589,16 +530,12 @@ describe("Tags page - edit category", () => {
     const category = getCategoryContainer(2);
 
     await userEvent.click(
-      category.querySelector(
-        '[role="button_delete_tag_category"]',
-      ),
+      category.querySelector('[role="button_delete_tag_category"]'),
     );
 
     expect(counterDeleteCategory).toBe(0);
 
-    expect(
-      document.querySelector('[data-category-id="2"]'),
-    ).not.toBeNull();
+    expect(document.querySelector('[data-category-id="2"]')).not.toBeNull();
   });
 });
 
@@ -610,68 +547,45 @@ describe("Tags page - add tag", () => {
   it("does not create a tag without a name", async () => {
     await setup();
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag"));
 
     expect(counterPostTag).toBe(0);
 
-    expect(
-      screen.getByPlaceholderText("Tag name en"),
-    ).toHaveClass("is-invalid");
+    expect(screen.getByPlaceholderText("Tag name en")).toHaveClass(
+      "is-invalid",
+    );
   });
 
   it("does not create a tag without a category", async () => {
     await setup();
 
-    await userEvent.type(
-      screen.getByPlaceholderText("Tag name en"),
-      "Leather",
-    );
+    await userEvent.type(screen.getByPlaceholderText("Tag name en"), "Leather");
 
     await changeLanguage("pl");
 
-    await userEvent.type(
-      screen.getByPlaceholderText("Tag name pl"),
-      "Skóra",
-    );
+    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skóra");
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag"));
 
     expect(counterPostTag).toBe(0);
 
     // Komponent nie musi oznaczać selecta klasą is-invalid.
     // Sprawdzamy rezultat walidacji, a nie konkretny styl.
-    expect(
-      screen.queryByText(/category/i),
-    ).toBeInTheDocument();
+    expect(screen.queryByText(/category/i)).toBeInTheDocument();
   });
 
   it("creates a tag with a category and translations", async () => {
     await setup();
 
-    await userEvent.type(
-      screen.getByPlaceholderText("Tag name en"),
-      "Leather",
-    );
+    await userEvent.type(screen.getByPlaceholderText("Tag name en"), "Leather");
 
     await changeLanguage("pl");
 
-    await userEvent.type(
-      screen.getByPlaceholderText("Tag name pl"),
-      "Skóra",
-    );
+    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skóra");
 
-    await userEvent.selectOptions(
-      screen.getByLabelText("Category:"),
-      "1",
-    );
+    await userEvent.selectOptions(screen.getByLabelText("Category:"), "1");
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag"));
 
     await waitFor(() => {
       expect(counterPostTag).toBe(1);
@@ -685,9 +599,7 @@ describe("Tags page - add tag", () => {
       tag_category_id: 1,
     });
 
-    expect(
-      await screen.findByText("Leather"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Leather")).toBeInTheDocument();
   });
 });
 
@@ -701,17 +613,11 @@ describe("Tags page - edit tag", () => {
 
     await userEvent.click(screen.getByText("Shoes"));
 
-    expect(
-      screen.getByPlaceholderText("Tag name en"),
-    ).toHaveValue("Shoes");
+    expect(screen.getByPlaceholderText("Tag name en")).toHaveValue("Shoes");
 
-    expect(
-      screen.getByLabelText("Category:"),
-    ).toHaveValue("1");
+    expect(screen.getByLabelText("Category:")).toHaveValue("1");
 
-    expect(
-      screen.getByRole("button_add_tag"),
-    ).toHaveTextContent("Save tag");
+    expect(screen.getByRole("button_add_tag")).toHaveTextContent("Save tag");
   });
 
   it("updates an existing tag", async () => {
@@ -724,9 +630,7 @@ describe("Tags page - edit tag", () => {
     await userEvent.clear(nameInput);
     await userEvent.type(nameInput, "Boots");
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag"));
 
     await waitFor(() => {
       expect(counterPutTag).toBe(1);
@@ -740,9 +644,7 @@ describe("Tags page - edit tag", () => {
       tag_category_id: 1,
     });
 
-    expect(
-      await screen.findByText("Boots"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Boots")).toBeInTheDocument();
   });
 
   it("does not update a tag when the name is empty", async () => {
@@ -750,19 +652,15 @@ describe("Tags page - edit tag", () => {
 
     await userEvent.click(screen.getByText("Shoes"));
 
-    await userEvent.clear(
-      screen.getByPlaceholderText("Tag name en"),
-    );
+    await userEvent.clear(screen.getByPlaceholderText("Tag name en"));
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag"));
 
     expect(counterPutTag).toBe(0);
 
-    expect(
-      screen.getByPlaceholderText("Tag name en"),
-    ).toHaveClass("is-invalid");
+    expect(screen.getByPlaceholderText("Tag name en")).toHaveClass(
+      "is-invalid",
+    );
   });
 
   it("clears the tag form", async () => {
@@ -770,25 +668,15 @@ describe("Tags page - edit tag", () => {
 
     await userEvent.click(screen.getByText("Shoes"));
 
-    expect(
-      screen.getByPlaceholderText("Tag name en"),
-    ).toHaveValue("Shoes");
+    expect(screen.getByPlaceholderText("Tag name en")).toHaveValue("Shoes");
 
-    await userEvent.click(
-      screen.getByRole("button_clear_tag"),
-    );
+    await userEvent.click(screen.getByRole("button_clear_tag"));
 
-    expect(
-      screen.getByPlaceholderText("Tag name en"),
-    ).toHaveValue("");
+    expect(screen.getByPlaceholderText("Tag name en")).toHaveValue("");
 
-    expect(
-      screen.getByLabelText("Category:"),
-    ).toHaveValue("");
+    expect(screen.getByLabelText("Category:")).toHaveValue("");
 
-    expect(
-      screen.getByRole("button_add_tag"),
-    ).toHaveTextContent("Add tag");
+    expect(screen.getByRole("button_add_tag")).toHaveTextContent("Add tag");
   });
 });
 
@@ -802,9 +690,7 @@ describe("Tags page - delete tag", () => {
 
     const category = getCategoryContainer(1);
 
-    await userEvent.click(
-      category.querySelector('[role="button_delete_tag"]'),
-    );
+    await userEvent.click(category.querySelector('[role="button_delete_tag"]'));
 
     expect(counterDeleteTag).toBe(0);
   });
@@ -818,18 +704,14 @@ describe("Tags page - delete tag", () => {
 
     const category = getCategoryContainer(1);
 
-    await userEvent.click(
-      category.querySelector('[role="button_delete_tag"]'),
-    );
+    await userEvent.click(category.querySelector('[role="button_delete_tag"]'));
 
     await waitFor(() => {
       expect(counterDeleteTag).toBe(1);
     });
 
     await waitFor(() => {
-      expect(
-        screen.queryByText("Shoes"),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByText("Shoes")).not.toBeInTheDocument();
     });
   });
 
@@ -842,9 +724,7 @@ describe("Tags page - delete tag", () => {
 
     const category = getCategoryContainer(1);
 
-    await userEvent.click(
-      category.querySelector('[role="button_delete_tag"]'),
-    );
+    await userEvent.click(category.querySelector('[role="button_delete_tag"]'));
 
     expect(counterDeleteTag).toBe(0);
     expect(screen.getByText("Shoes")).toBeInTheDocument();
@@ -873,20 +753,14 @@ describe("Tags page - API errors", () => {
 
     render(TagsPage);
 
-    expect(
-      await screen.findByTestId("tags-page"),
-    ).toBeInTheDocument();
+    expect(await screen.findByTestId("tags-page")).toBeInTheDocument();
 
     // Czekamy na zakończenie obsługi błędu i sprawdzamy,
     // że komponent wyświetla komunikat błędu.
     await waitFor(() => {
       expect(
-        document.querySelector(
-          '[role="alert_danger"]',
-        ) ||
-          document.querySelector(
-            '[data-testid="alert_danger"]',
-          ) ||
+        document.querySelector('[role="alert_danger"]') ||
+          document.querySelector('[data-testid="alert_danger"]') ||
           document.querySelector(".alert-danger"),
       ).not.toBeNull();
     });
@@ -909,26 +783,15 @@ describe("Tags page - API errors", () => {
 
     await setup();
 
-    await userEvent.type(
-      screen.getByPlaceholderText("Tag name en"),
-      "Leather",
-    );
+    await userEvent.type(screen.getByPlaceholderText("Tag name en"), "Leather");
 
     await changeLanguage("pl");
 
-    await userEvent.type(
-      screen.getByPlaceholderText("Tag name pl"),
-      "Skóra",
-    );
+    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skóra");
 
-    await userEvent.selectOptions(
-      screen.getByLabelText("Category:"),
-      "1",
-    );
+    await userEvent.selectOptions(screen.getByLabelText("Category:"), "1");
 
-    await userEvent.click(
-      screen.getByRole("button_add_tag"),
-    );
+    await userEvent.click(screen.getByRole("button_add_tag"));
 
     await waitFor(() => {
       expect(counterPostTag).toBe(0);
@@ -937,12 +800,8 @@ describe("Tags page - API errors", () => {
     // Błąd API powinien być widoczny w komunikacie na stronie.
     await waitFor(() => {
       expect(
-        document.querySelector(
-          '[role="alert_danger"]',
-        ) ||
-          document.querySelector(
-            '[data-testid="alert_danger"]',
-          ) ||
+        document.querySelector('[role="alert_danger"]') ||
+          document.querySelector('[data-testid="alert_danger"]') ||
           document.querySelector(".alert-danger"),
       ).not.toBeNull();
     });
