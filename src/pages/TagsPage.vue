@@ -141,7 +141,12 @@
           </div>
 
           <!-- New category form -->
-          <div v-if="isAddCategory" class="container mt-3" style="margin-left: 0px; padding-left: 0px">
+          <div 
+            v-if="isAddCategory" 
+            class="container mt-3" 
+            style="margin-left: 0px; padding-left: 0px"
+            data-testid="new-category-form"
+          >
             <h6>New category</h6>
 
             <div class="row align-items-start">

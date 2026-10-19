@@ -292,17 +292,8 @@ const getCategoryContainer = (id) => {
   return container;
 };
 
-const getNewCategoryForm = () => {
-  const heading = screen.getByText("New category");
-
-  const form =
-    heading.closest("form") ??
-    heading.parentElement?.parentElement;
-
-  expect(form).not.toBeNull();
-
-  return form;
-};
+const getNewCategoryForm = () =>
+  screen.getByTestId("new-category-form");
 
 const getNewCategoryInput = (lang = "en") => {
   const form = getNewCategoryForm();
@@ -317,15 +308,8 @@ const getNewCategoryInput = (lang = "en") => {
 };
 
 const changeLanguage = async (lang) => {
-  const candidates = [
-    screen.queryByRole(`lang_${lang}`),
-    screen.queryByTestId(`lang-${lang}`),
-    screen.queryByText(lang.toUpperCase()),
-  ].filter(Boolean);
-
-  if (candidates.length > 0) {
-    await userEvent.click(candidates[0]);
-  }
+  const languageElement = screen.getByRole(`lang_${lang}`);
+  await userEvent.click(languageElement);
 };
 
 // ==================================================
