@@ -459,7 +459,6 @@ describe("Tags page - add category", () => {
     expect(screen.getByText("New category")).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button_cancel_new_tag_category"));
-    //await userEvent.click(screen.getByTitle("Cancel")); // zamiast tego -- bo moze byc wiele przyciskow cancel - dlatego proponje nadac role -- co o tym myslisz?
 
     expect(screen.queryByText("New category")).not.toBeInTheDocument();
   });
@@ -573,15 +572,15 @@ describe("Tags page - add tag", () => {
 
     await changeLanguage("pl");
 
-    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skóra");
+    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skoora");
 
     await userEvent.click(screen.getByRole("button_add_tag"));
 
-    expect(counterPostTag).toBe(0);
+    const errMsg = trans.ttt("msg_select_tag_category");
+    expect(errMsg).not.toBe("");
+    await screen.findByText(errMsg);
 
-    // Komponent nie musi oznaczać selecta klasą is-invalid.
-    // Sprawdzamy rezultat walidacji, a nie konkretny styl.
-    expect(screen.queryByText(/category/i)).toBeInTheDocument();
+    expect(counterPostTag).toBe(0);
   });
 
   it("creates a tag with a category and translations", async () => {
