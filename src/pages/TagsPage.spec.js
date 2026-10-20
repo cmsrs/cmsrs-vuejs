@@ -431,22 +431,22 @@ describe("Tags page - add category", () => {
 
     await changeLanguage("pl");
 
-    await userEvent.type(getNewCategoryInput("pl"), "Materiał");
+    await userEvent.type(getNewCategoryInput("pl"), "Materiall");
 
     const form = getNewCategoryForm();
 
-    const entityTypeSelect = Array.from(form.querySelectorAll("select")).find(
-      (select) =>
-        Array.from(select.options).some((option) => option.value === "product"),
-    );
-
-    expect(entityTypeSelect).toBeDefined();
+    const entityTypeSelect = form.querySelector("select");
+    expect(entityTypeSelect).not.toBeNull();
 
     await userEvent.selectOptions(entityTypeSelect, "");
 
     await userEvent.click(
-      screen.getAllByRole("button_save_tag_category").at(-1),
+      form.querySelector('[role="button_save_tag_category"]'),
     );
+
+    const errMsg = trans.ttt("msg_select_category_entity_type");
+    expect(errMsg).not.toBe("");
+    await screen.findByText(errMsg);
 
     expect(counterPostCategory).toBe(0);
   });
