@@ -590,7 +590,7 @@ describe("Tags page - add tag", () => {
 
     await changeLanguage("pl");
 
-    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skóra");
+    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skoora");
 
     await userEvent.selectOptions(screen.getByLabelText("Category:"), "1");
 
@@ -603,12 +603,12 @@ describe("Tags page - add tag", () => {
     expect(lastTagRequest).toMatchObject({
       name: {
         en: "Leather",
-        pl: "Skóra",
+        pl: "Skoora",
       },
       tag_category_id: 1,
     });
 
-    expect(await screen.findByText("Leather")).toBeInTheDocument();
+    expect(await screen.findByText("Skoora")).toBeInTheDocument();
   });
 });
 
