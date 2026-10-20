@@ -19,6 +19,7 @@ import {
   vi,
 } from "vitest";
 
+import trans from "../helpers/trans.js";
 import storage from "../state/storage.js";
 import { API_SECRET } from "../config.js";
 
@@ -404,13 +405,21 @@ describe("Tags page - add category", () => {
 
     await userEvent.click(screen.getByRole("button_add_tag_category"));
 
+    const englishInput = getNewCategoryInput("en");
+
+    await userEvent.type(englishInput, "Material");
+
     await userEvent.click(
-      screen.getAllByRole("button_save_tag_category").at(-1),
+      getNewCategoryForm().querySelector('[role="button_save_tag_category"]'),
     );
 
-    expect(counterPostCategory).toBe(0);
-
     expect(getNewCategoryInput("en")).toHaveClass("is-invalid");
+
+    const errMsg = trans.ttt("msg_add_category_name");
+    expect(errMsg).not.toBe("");
+    await screen.findByText(errMsg + " (pl)");
+
+    expect(counterPostCategory).toBe(0);
   });
 
   it("does not send a request when category entity type is empty", async () => {
