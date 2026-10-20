@@ -192,6 +192,7 @@
                 <i
                   class="fas fa-trash cursor-pointer"
                   :class="{ 'disabled-if-loader': pre_loader }"
+                  role="button_cancel_new_tag_category"
                   title="Cancel"
                   @click="cancelAddCategory"
                 ></i>

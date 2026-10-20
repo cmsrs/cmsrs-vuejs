@@ -458,7 +458,8 @@ describe("Tags page - add category", () => {
 
     expect(screen.getByText("New category")).toBeInTheDocument();
 
-    await userEvent.click(screen.getByTitle("Cancel"));
+    await userEvent.click(screen.getByRole("button_cancel_new_tag_category"));
+    //await userEvent.click(screen.getByTitle("Cancel")); // zamiast tego -- bo moze byc wiele przyciskow cancel - dlatego proponje nadac role -- co o tym myslisz?
 
     expect(screen.queryByText("New category")).not.toBeInTheDocument();
   });
