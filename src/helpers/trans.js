@@ -31,6 +31,7 @@ const ttt = (key) => {
       "Are you sure you want to delete this category and all its tags?",
     success_tag_added: "Tag has been added",
     success_tag_changed: "Tag has been changed",
+    success_tag_deleted: "Tag has been deleted",
     success_tag_category_deleted: "Category has been deleted",
     success_tag_category_added: "Category has been added",
     success_tag_category_changed: "Category has been changed",
