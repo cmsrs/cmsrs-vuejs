@@ -114,7 +114,7 @@
                     :class="{ 'disabled-if-loader': pre_loader }"
                     title="Delete tag"
                     role="button_delete_tag"
-                    @click.prevent="deleteTag"
+                    @click.stop="deleteTag(tag)"
                   ></i>
                 </div>
 
@@ -674,12 +674,8 @@ async function saveTag() {
   }
 }
 
-async function deleteTag() {
+async function deleteTag(tag) {
   clearMsg();
-
-  if (!currentTagId.value) {
-    return false;
-  }
 
   if (!window.confirm(trans.ttt("confirm_tag_delete"))) {
     return;
@@ -690,7 +686,7 @@ async function deleteTag() {
   }
 
   try {
-    const response = await deleteTagRequest(currentTagId.value, token);
+    const response = await deleteTagRequest(tag.id, token);
 
     if (response.data.success) {
       await refreshTags();

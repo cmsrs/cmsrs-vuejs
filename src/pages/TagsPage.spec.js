@@ -694,20 +694,27 @@ describe("Tags page - edit tag", () => {
 // ==================================================
 
 describe("Tags page - delete tag", () => {
-  it("does not delete a tag when none is selected", async () => {
+  it("does not delete a tag when deletion is cancelled", async () => {
     await setup();
+
+    expect(screen.getByText("Shoes")).toBeInTheDocument();
+
+    confirmSpy.mockReturnValueOnce(false);
 
     const category = getCategoryContainer(1);
 
     await userEvent.click(category.querySelector('[role="button_delete_tag"]'));
 
+    expect(confirmSpy).toHaveBeenCalledOnce();
     expect(counterDeleteTag).toBe(0);
+    expect(screen.getByText("Shoes")).toBeInTheDocument();
   });
 
   it("deletes a selected tag after confirmation", async () => {
     await setup();
 
-    await userEvent.click(screen.getByText("Shoes"));
+    expect(screen.getByText("Shoes")).toBeInTheDocument();
+    //await userEvent.click(screen.getByText("Shoes")); -- jak to odkomentuje to test zadziala - nie rozumem - przeciez tylko wystarczy kliknac  przyciks:     await userEvent.click(category.querySelector('[role="button_delete_tag"]')); - i nie trzeba klikac na ta kategorie ?? = nie rozumem tego
 
     confirmSpy.mockReturnValueOnce(true);
 
@@ -727,7 +734,7 @@ describe("Tags page - delete tag", () => {
   it("does not delete a tag when confirmation is rejected", async () => {
     await setup();
 
-    await userEvent.click(screen.getByText("Shoes"));
+    expect(screen.queryByText("Shoes")).toBeInTheDocument();
 
     confirmSpy.mockReturnValueOnce(false);
 
@@ -764,15 +771,7 @@ describe("Tags page - API errors", () => {
 
     expect(await screen.findByTestId("tags-page")).toBeInTheDocument();
 
-    // Czekamy na zakończenie obsługi błędu i sprawdzamy,
-    // że komponent wyświetla komunikat błędu.
-    await waitFor(() => {
-      expect(
-        document.querySelector('[role="alert_danger"]') ||
-          document.querySelector('[data-testid="alert_danger"]') ||
-          document.querySelector(".alert-danger"),
-      ).not.toBeNull();
-    });
+    expect(await screen.findByRole("alert_danger")).toBeInTheDocument();
   });
 
   it("displays an error when creating a tag fails", async () => {
@@ -796,7 +795,7 @@ describe("Tags page - API errors", () => {
 
     await changeLanguage("pl");
 
-    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skóra");
+    await userEvent.type(screen.getByPlaceholderText("Tag name pl"), "Skoora");
 
     await userEvent.selectOptions(screen.getByLabelText("Category:"), "1");
 
@@ -806,13 +805,6 @@ describe("Tags page - API errors", () => {
       expect(counterPostTag).toBe(0);
     });
 
-    // Błąd API powinien być widoczny w komunikacie na stronie.
-    await waitFor(() => {
-      expect(
-        document.querySelector('[role="alert_danger"]') ||
-          document.querySelector('[data-testid="alert_danger"]') ||
-          document.querySelector(".alert-danger"),
-      ).not.toBeNull();
-    });
+    expect(await screen.findByRole("alert_danger")).toBeInTheDocument();
   });
 });

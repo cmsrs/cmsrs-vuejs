@@ -9,7 +9,8 @@ elif [ "$1" = "coverage" ]; then
     exit
 
 elif [ "$1" = "-t" ]; then
-    npm run test -- -t "$2"
+    npx vitest run  -t "$2"
+    #npm run test -- -t "$2"
     exit
 
 else
