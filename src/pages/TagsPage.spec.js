@@ -336,8 +336,8 @@ describe("Tags page - initialization", () => {
 
     const headings = screen.getAllByRole("heading", { level: 4 });
     expect(headings.map((heading) => heading.textContent)).toEqual([
-      "Page",
       "Product",
+      "Page",
     ]);
 
     const firstCategory = getCategoryContainer(1);

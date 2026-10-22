@@ -26,10 +26,11 @@
 
           <!-- Existing categories -->
           <template v-for="(category, index) in categories" :key="category.id">
+            
             <h4
               v-if="
-                index === 0 ||
-                categories[index - 1].entity_type !== category.entity_type
+                (index === 0 ||
+                categories[index - 1].entity_type !== category.entity_type) && (tagEntityTypes.length > 1)
               "
               class="mt-3"
               :data-entity-type-heading="category.entity_type"
@@ -387,7 +388,7 @@ function getTagsByCategory(categoryId) {
 
 function entityTypeLabel(entityType) {
   return entityType
-    ? entityType.charAt(0).toUpperCase() + entityType.slice(1)
+    ? "For "+entityType
     : "";
 }
 
@@ -417,10 +418,9 @@ async function refreshCategories() {
 
   if (response.data.success) {
     const groupedCategories = response.data.data || {};
-    const typeOrder = ["page", "product"];
     const entityTypes = Object.keys(groupedCategories).sort((left, right) => {
-      const leftIndex = typeOrder.indexOf(left);
-      const rightIndex = typeOrder.indexOf(right);
+      const leftIndex = tagEntityTypes.indexOf(left);
+      const rightIndex = tagEntityTypes.indexOf(right);
 
       if (leftIndex === -1 && rightIndex === -1) {
         return left.localeCompare(right);
