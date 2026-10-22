@@ -74,6 +74,19 @@ const tagsInitial = [
   },
 ];
 
+const getGroupedCategories = () =>
+  categories.reduce((grouped, category) => {
+    const { entity_type: entityType } = category;
+    grouped[entityType] ||= [];
+    grouped[entityType].push({
+      ...category,
+      tags: tags
+        .filter((tag) => Number(tag.tag_category_id) === Number(category.id))
+        .map(({ id, name }) => ({ id, name })),
+    });
+    return grouped;
+  }, {});
+
 let categories;
 let tags;
 
@@ -94,7 +107,7 @@ const server = setupServer(
   http.get(apiUrl + "/tag-categories", () => {
     return HttpResponse.json({
       success: true,
-      data: categories,
+      data: getGroupedCategories(),
     });
   }),
 
@@ -320,6 +333,12 @@ describe("Tags page - initialization", () => {
 
     expect(screen.getByText("Product type")).toBeInTheDocument();
     expect(screen.getByText("Color")).toBeInTheDocument();
+
+    const headings = screen.getAllByRole("heading", { level: 4 });
+    expect(headings.map((heading) => heading.textContent)).toEqual([
+      "Page",
+      "Product",
+    ]);
 
     const firstCategory = getCategoryContainer(1);
 

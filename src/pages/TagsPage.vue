@@ -25,120 +25,132 @@
           </button>
 
           <!-- Existing categories -->
-          <div
-            v-for="category in categories"
-            :key="category.id"
-            class="container mt-3"
-            :data-category-id="category.id"
-            style="margin-left: 0px; padding-left: 0px"
-          >
-            <div class="row">
-              <!-- Category name -->
-              <div class="form-group col-6">
-                <input
-                  class="form-control"
-                  :class="{
-                    'is-invalid': categoryErrors[category.id]?.includes('name'),
-                  }"
-                  :disabled="pre_loader"
-                  :value="category.name?.[lang] ?? ''"
-                  :placeholder="`Category name ${lang}`"
-                  @input="
-                    updateCategoryName(category.id, lang, $event.target.value)
-                  "
-                />
-              </div>
+          <template v-for="(category, index) in categories" :key="category.id">
+            <h4
+              v-if="
+                index === 0 ||
+                categories[index - 1].entity_type !== category.entity_type
+              "
+              class="mt-3"
+              :data-entity-type-heading="category.entity_type"
+            >
+              {{ entityTypeLabel(category.entity_type) }}
+            </h4>
 
-              <!-- Entity type -->
-              <div v-if="tagEntityTypes.length > 1" class="form-group col-4">
-                <select
-                  class="form-control"
-                  :class="{
-                    'is-invalid':
-                      categoryErrors[category.id]?.includes('entity_type'),
-                  }"
-                  :disabled="pre_loader"
-                  v-model="category.entity_type"
-                >
-                  <option value="">Select type</option>
+            <div
+              class="container mt-3"
+              :data-category-id="category.id"
+              style="margin-left: 0px; padding-left: 0px"
+            >
+              <div class="row">
+                <!-- Category name -->
+                <div class="form-group col-6">
+                  <input
+                    class="form-control"
+                    :class="{
+                      'is-invalid':
+                        categoryErrors[category.id]?.includes('name'),
+                    }"
+                    :disabled="pre_loader"
+                    :value="category.name?.[lang] ?? ''"
+                    :placeholder="`Category name ${lang}`"
+                    @input="
+                      updateCategoryName(category.id, lang, $event.target.value)
+                    "
+                  />
+                </div>
 
-                  <option
-                    v-for="entityType in tagEntityTypes"
-                    :key="entityType"
-                    :value="entityType"
+                <!-- Entity type -->
+                <div v-if="tagEntityTypes.length > 1" class="form-group col-4">
+                  <select
+                    class="form-control"
+                    :class="{
+                      'is-invalid':
+                        categoryErrors[category.id]?.includes('entity_type'),
+                    }"
+                    :disabled="pre_loader"
+                    v-model="category.entity_type"
                   >
-                    {{ entityType }}
-                  </option>
-                </select>
-              </div>
+                    <option value="">Select type</option>
 
-              <!-- Save category -->
-              <div class="col-1">
-                <i
-                  class="far fa-save cursor-pointer"
-                  :class="{ 'disabled-if-loader': pre_loader }"
-                  title="Save category"
-                  role="button_save_tag_category"
-                  @click="saveCategory(category)"
-                ></i>
-              </div>
+                    <option
+                      v-for="entityType in tagEntityTypes"
+                      :key="entityType"
+                      :value="entityType"
+                    >
+                      {{ entityType }}
+                    </option>
+                  </select>
+                </div>
 
-              <!-- Delete category -->
-              <div class="col-1 trash">
-                <i
-                  class="fas fa-trash cursor-pointer"
-                  :class="{ 'disabled-if-loader': pre_loader }"
-                  title="Delete category"
-                  role="button_delete_tag_category"
-                  @click="deleteCategory(category)"
-                ></i>
-              </div>
-            </div>
+                <!-- Save category -->
+                <div class="col-1">
+                  <i
+                    class="far fa-save cursor-pointer"
+                    :class="{ 'disabled-if-loader': pre_loader }"
+                    title="Save category"
+                    role="button_save_tag_category"
+                    @click="saveCategory(category)"
+                  ></i>
+                </div>
 
-            <!-- Tags assigned to this category -->
-            <div class="ms-3 mt-2 mb-3">
-              <div
-                v-for="tag in getTagsByCategory(category.id)"
-                :key="tag.id"
-                class="row mb-2"
-                :class="{
-                  'selected-tag': currentTagId === tag.id,
-                }"
-                role="tag_item"
-                @click="editTag(tag)"
-              >
-                <!-- Delete tag -->
+                <!-- Delete category -->
                 <div class="col-1 trash">
                   <i
                     class="fas fa-trash cursor-pointer"
                     :class="{ 'disabled-if-loader': pre_loader }"
-                    title="Delete tag"
-                    role="button_delete_tag"
-                    @click.stop="deleteTag(tag)"
+                    title="Delete category"
+                    role="button_delete_tag_category"
+                    @click="deleteCategory(category)"
                   ></i>
-                </div>
-
-                <div class="col-1">
-                  <i
-                    class="far fa-edit cursor-pointer"
-                    title="Edit tag"
-                    @click.stop="editTag(tag)"
-                  ></i>
-                </div>
-
-                <div class="col-10">
-                  <span>{{ tag.name?.[lang] || "(empty)" }}</span>
                 </div>
               </div>
 
-              <div
-                v-if="getTagsByCategory(category.id).length === 0"
-                class="text-secondary small mb-2"
-              >
-                No tags in this category
+              <!-- Tags assigned to this category -->
+              <div class="ms-3 mt-2 mb-3">
+                <div
+                  v-for="tag in getTagsByCategory(category.id)"
+                  :key="tag.id"
+                  class="row mb-2"
+                  :class="{
+                    'selected-tag': currentTagId === tag.id,
+                  }"
+                  role="tag_item"
+                  @click="editTag(tag)"
+                >
+                  <!-- Delete tag -->
+                  <div class="col-1 trash">
+                    <i
+                      class="fas fa-trash cursor-pointer"
+                      :class="{ 'disabled-if-loader': pre_loader }"
+                      title="Delete tag"
+                      role="button_delete_tag"
+                      @click.stop="deleteTag(tag)"
+                    ></i>
+                  </div>
+
+                  <div class="col-1">
+                    <i
+                      class="far fa-edit cursor-pointer"
+                      title="Edit tag"
+                      @click.stop="editTag(tag)"
+                    ></i>
+                  </div>
+
+                  <div class="col-10">
+                    <span>{{ tag.name?.[lang] || "(empty)" }}</span>
+                  </div>
+                </div>
+
+                <div
+                  v-if="getTagsByCategory(category.id).length === 0"
+                  class="text-secondary small mb-2"
+                >
+                  No tags in this category
+                </div>
               </div>
             </div>
-          </div>
+          </template>
 
           <!-- New category form -->
           <div
@@ -373,6 +385,12 @@ function getTagsByCategory(categoryId) {
   );
 }
 
+function entityTypeLabel(entityType) {
+  return entityType
+    ? entityType.charAt(0).toUpperCase() + entityType.slice(1)
+    : "";
+}
+
 function emptyTranslations() {
   return functions.createEmptyObj(langs);
 }
@@ -398,7 +416,33 @@ async function refreshCategories() {
   const response = await getTagCategories(token);
 
   if (response.data.success) {
-    categories.value = response.data.data || [];
+    const groupedCategories = response.data.data || {};
+    const typeOrder = ["page", "product"];
+    const entityTypes = Object.keys(groupedCategories).sort((left, right) => {
+      const leftIndex = typeOrder.indexOf(left);
+      const rightIndex = typeOrder.indexOf(right);
+
+      if (leftIndex === -1 && rightIndex === -1) {
+        return left.localeCompare(right);
+      }
+
+      if (leftIndex === -1) return 1;
+      if (rightIndex === -1) return -1;
+      return leftIndex - rightIndex;
+    });
+
+    categories.value = entityTypes.flatMap((entityType) =>
+      (groupedCategories[entityType] || []).map((category) => ({
+        ...category,
+        entity_type: entityType,
+      })),
+    );
+    tags.value = categories.value.flatMap((category) =>
+      (category.tags || []).map((tag) => ({
+        ...tag,
+        tag_category_id: category.id,
+      })),
+    );
     return true;
   }
 
@@ -715,7 +759,7 @@ onMounted(async () => {
   pre_loader.value = true;
 
   try {
-    await Promise.all([refreshCategories(), refreshTags()]);
+    await refreshCategories();
   } catch (error) {
     handleError(error, config.demo_status, msgWrong, pre_loader);
   } finally {
