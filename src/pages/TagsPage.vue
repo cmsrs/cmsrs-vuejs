@@ -25,19 +25,20 @@
           </button>
 
           <!-- Existing categories -->
-          <template v-for="(category, index) in categories" :key="category.id">
-            
+          <section
+            v-for="group in categoryGroups"
+            :key="group.entityType"
+            :data-entity-type="group.entityType"
+          >
             <h4
-              v-if="
-                (index === 0 ||
-                categories[index - 1].entity_type !== category.entity_type) && (tagEntityTypes.length > 1)
-              "
+              v-if="tagEntityTypes.length > 1"
               class="mt-3"
-              :data-entity-type-heading="category.entity_type"
+              :data-entity-type-heading="group.entityType"
             >
-              {{ entityTypeLabel(category.entity_type) }}
+              {{ entityTypeLabel(group.entityType) }}
             </h4>
 
+            <template v-for="category in group.categories" :key="category.id">
             <div
               class="container mt-3"
               :data-category-id="category.id"
@@ -151,7 +152,8 @@
                 </div>
               </div>
             </div>
-          </template>
+            </template>
+          </section>
 
           <!-- New category form -->
           <div
@@ -294,7 +296,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 import functions from "../helpers/functions.js";
 import trans from "../helpers/trans.js";
@@ -333,6 +335,7 @@ const pre_loader = ref(false);
 
 const categories = ref([]);
 const tags = ref([]);
+const categoryGroups = ref([]);
 
 const isAddCategory = ref(false);
 const newCategoryError = ref(false);
@@ -388,7 +391,7 @@ function getTagsByCategory(categoryId) {
 
 function entityTypeLabel(entityType) {
   return entityType
-    ? "For "+entityType
+    ? "For " + entityType
     : "";
 }
 
@@ -418,25 +421,16 @@ async function refreshCategories() {
 
   if (response.data.success) {
     const groupedCategories = response.data.data || {};
-    const entityTypes = Object.keys(groupedCategories).sort((left, right) => {
-      const leftIndex = tagEntityTypes.indexOf(left);
-      const rightIndex = tagEntityTypes.indexOf(right);
-
-      if (leftIndex === -1 && rightIndex === -1) {
-        return left.localeCompare(right);
-      }
-
-      if (leftIndex === -1) return 1;
-      if (rightIndex === -1) return -1;
-      return leftIndex - rightIndex;
-    });
-
-    categories.value = entityTypes.flatMap((entityType) =>
-      (groupedCategories[entityType] || []).map((category) => ({
-        ...category,
-        entity_type: entityType,
-      })),
+    categoryGroups.value = Object.entries(groupedCategories).map(
+      ([entityType, entityCategories]) => ({
+        entityType,
+        categories: (entityCategories || []).map((category) => ({
+          ...category,
+          entity_type: entityType,
+        })),
+      }),
     );
+    categories.value = categoryGroups.value.flatMap((group) => group.categories);
     tags.value = categories.value.flatMap((category) =>
       (category.tags || []).map((tag) => ({
         ...tag,
