@@ -39,119 +39,126 @@
             </h4>
 
             <template v-for="category in group.categories" :key="category.id">
-            <div
-              class="container mt-3"
-              :data-category-id="category.id"
-              style="margin-left: 0px; padding-left: 0px"
-            >
-              <div class="row">
-                <!-- Category name -->
-                <div class="form-group col-6">
-                  <input
-                    class="form-control"
-                    :class="{
-                      'is-invalid':
-                        categoryErrors[category.id]?.includes('name'),
-                    }"
-                    :disabled="pre_loader"
-                    :value="category.name?.[lang] ?? ''"
-                    :placeholder="`Category name ${lang}`"
-                    @input="
-                      updateCategoryName(category.id, lang, $event.target.value)
-                    "
-                  />
-                </div>
+              <div
+                class="container mt-3"
+                :data-category-id="category.id"
+                style="margin-left: 0px; padding-left: 0px"
+              >
+                <div class="row">
+                  <!-- Category name -->
+                  <div class="form-group col-6">
+                    <input
+                      class="form-control"
+                      :class="{
+                        'is-invalid':
+                          categoryErrors[category.id]?.includes('name'),
+                      }"
+                      :disabled="pre_loader"
+                      :value="category.name?.[lang] ?? ''"
+                      :placeholder="`Category name ${lang}`"
+                      @input="
+                        updateCategoryName(
+                          category.id,
+                          lang,
+                          $event.target.value,
+                        )
+                      "
+                    />
+                  </div>
 
-                <!-- Entity type -->
-                <div v-if="tagEntityTypes.length > 1" class="form-group col-4">
-                  <select
-                    class="form-control"
-                    :class="{
-                      'is-invalid':
-                        categoryErrors[category.id]?.includes('entity_type'),
-                    }"
-                    :disabled="pre_loader"
-                    v-model="category.entity_type"
+                  <!-- Entity type -->
+                  <div
+                    v-if="tagEntityTypes.length > 1"
+                    class="form-group col-4"
                   >
-                    <option value="">Select type</option>
-
-                    <option
-                      v-for="entityType in tagEntityTypes"
-                      :key="entityType"
-                      :value="entityType"
+                    <select
+                      class="form-control"
+                      :class="{
+                        'is-invalid':
+                          categoryErrors[category.id]?.includes('entity_type'),
+                      }"
+                      :disabled="pre_loader"
+                      v-model="category.entity_type"
                     >
-                      {{ entityType }}
-                    </option>
-                  </select>
-                </div>
+                      <option value="">Select type</option>
 
-                <!-- Save category -->
-                <div class="col-1">
-                  <i
-                    class="far fa-save cursor-pointer"
-                    :class="{ 'disabled-if-loader': pre_loader }"
-                    title="Save category"
-                    role="button_save_tag_category"
-                    @click="saveCategory(category)"
-                  ></i>
-                </div>
+                      <option
+                        v-for="entityType in tagEntityTypes"
+                        :key="entityType"
+                        :value="entityType"
+                      >
+                        {{ entityType }}
+                      </option>
+                    </select>
+                  </div>
 
-                <!-- Delete category -->
-                <div class="col-1 trash">
-                  <i
-                    class="fas fa-trash cursor-pointer"
-                    :class="{ 'disabled-if-loader': pre_loader }"
-                    title="Delete category"
-                    role="button_delete_tag_category"
-                    @click="deleteCategory(category)"
-                  ></i>
-                </div>
-              </div>
+                  <!-- Save category -->
+                  <div class="col-1">
+                    <i
+                      class="far fa-save cursor-pointer"
+                      :class="{ 'disabled-if-loader': pre_loader }"
+                      title="Save category"
+                      role="button_save_tag_category"
+                      @click="saveCategory(category)"
+                    ></i>
+                  </div>
 
-              <!-- Tags assigned to this category -->
-              <div class="ms-3 mt-2 mb-3">
-                <div
-                  v-for="tag in getTagsByCategory(category.id)"
-                  :key="tag.id"
-                  class="row mb-2"
-                  :class="{
-                    'selected-tag': currentTagId === tag.id,
-                  }"
-                  role="tag_item"
-                  @click="editTag(tag)"
-                >
-                  <!-- Delete tag -->
+                  <!-- Delete category -->
                   <div class="col-1 trash">
                     <i
                       class="fas fa-trash cursor-pointer"
                       :class="{ 'disabled-if-loader': pre_loader }"
-                      title="Delete tag"
-                      role="button_delete_tag"
-                      @click.stop="deleteTag(tag)"
+                      title="Delete category"
+                      role="button_delete_tag_category"
+                      @click="deleteCategory(category)"
                     ></i>
-                  </div>
-
-                  <div class="col-1">
-                    <i
-                      class="far fa-edit cursor-pointer"
-                      title="Edit tag"
-                      @click.stop="editTag(tag)"
-                    ></i>
-                  </div>
-
-                  <div class="col-10">
-                    <span>{{ tag.name?.[lang] || "(empty)" }}</span>
                   </div>
                 </div>
 
-                <div
-                  v-if="getTagsByCategory(category.id).length === 0"
-                  class="text-secondary small mb-2"
-                >
-                  No tags in this category
+                <!-- Tags assigned to this category -->
+                <div class="ms-3 mt-2 mb-3">
+                  <div
+                    v-for="tag in getTagsByCategory(category.id)"
+                    :key="tag.id"
+                    class="row mb-2"
+                    :class="{
+                      'selected-tag': currentTagId === tag.id,
+                    }"
+                    role="tag_item"
+                    @click="editTag(tag)"
+                  >
+                    <!-- Delete tag -->
+                    <div class="col-1 trash">
+                      <i
+                        class="fas fa-trash cursor-pointer"
+                        :class="{ 'disabled-if-loader': pre_loader }"
+                        title="Delete tag"
+                        role="button_delete_tag"
+                        @click.stop="deleteTag(tag)"
+                      ></i>
+                    </div>
+
+                    <div class="col-1">
+                      <i
+                        class="far fa-edit cursor-pointer"
+                        title="Edit tag"
+                        @click.stop="editTag(tag)"
+                      ></i>
+                    </div>
+
+                    <div class="col-10">
+                      <span>{{ tag.name?.[lang] || "(empty)" }}</span>
+                    </div>
+                  </div>
+
+                  <div
+                    v-if="getTagsByCategory(category.id).length === 0"
+                    class="text-secondary small mb-2"
+                  >
+                    No tags in this category
+                  </div>
                 </div>
               </div>
-            </div>
             </template>
           </section>
 
@@ -308,7 +315,6 @@ import {
   putTagCategory,
   deleteTagCategory,
   postTag,
-  getTags,
   putTag,
   deleteTag as deleteTagRequest,
 } from "../api/apiCalls.js";
@@ -390,9 +396,7 @@ function getTagsByCategory(categoryId) {
 }
 
 function entityTypeLabel(entityType) {
-  return entityType
-    ? "For " + entityType
-    : "";
+  return entityType ? "For " + entityType : "";
 }
 
 function emptyTranslations() {
@@ -430,7 +434,9 @@ async function refreshCategories() {
         })),
       }),
     );
-    categories.value = categoryGroups.value.flatMap((group) => group.categories);
+    categories.value = categoryGroups.value.flatMap(
+      (group) => group.categories,
+    );
     tags.value = categories.value.flatMap((category) =>
       (category.tags || []).map((tag) => ({
         ...tag,
@@ -441,17 +447,6 @@ async function refreshCategories() {
   }
 
   throw new Error(trans.ttt("error_loading_tag_categories"));
-}
-
-async function refreshTags() {
-  const response = await getTags(token);
-
-  if (response.data.success) {
-    tags.value = response.data.data || [];
-    return true;
-  }
-
-  throw new Error(trans.ttt("error_loading_tags"));
 }
 
 // --------------------------------------------------
@@ -693,7 +688,7 @@ async function saveTag() {
     if (response.data.success) {
       const wasNew = !currentTagId.value;
 
-      await refreshTags();
+      await refreshCategories();
 
       if (wasNew) {
         clearTagData();
@@ -727,7 +722,7 @@ async function deleteTag(tag) {
     const response = await deleteTagRequest(tag.id, token);
 
     if (response.data.success) {
-      await refreshTags();
+      await refreshCategories();
 
       clearTagData();
 

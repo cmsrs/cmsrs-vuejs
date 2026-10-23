@@ -79,7 +79,8 @@ const getGroupedCategories = () =>
     const { entity_type: entityType } = category;
     grouped[entityType] ||= [];
     grouped[entityType].push({
-      ...category,
+      id: category.id,
+      name: category.name,
       tags: tags
         .filter((tag) => Number(tag.tag_category_id) === Number(category.id))
         .map(({ id, name }) => ({ id, name })),
@@ -93,6 +94,7 @@ let tags;
 let counterPostCategory;
 let counterPutCategory;
 let counterDeleteCategory;
+let counterGetTagCategories;
 
 let counterPostTag;
 let counterPutTag;
@@ -105,6 +107,7 @@ const server = setupServer(
   // Categories
 
   http.get(apiUrl + "/tag-categories", () => {
+    counterGetTagCategories += 1;
     return HttpResponse.json({
       success: true,
       data: getGroupedCategories(),
@@ -158,13 +161,6 @@ const server = setupServer(
   }),
 
   // Tags
-
-  http.get(apiUrl + "/tags", () => {
-    return HttpResponse.json({
-      success: true,
-      data: tags,
-    });
-  }),
 
   http.post(apiUrl + "/tags", async ({ request }) => {
     counterPostTag += 1;
@@ -226,6 +222,7 @@ beforeEach(() => {
   counterPostCategory = 0;
   counterPutCategory = 0;
   counterDeleteCategory = 0;
+  counterGetTagCategories = 0;
 
   counterPostTag = 0;
   counterPutTag = 0;
@@ -336,9 +333,10 @@ describe("Tags page - initialization", () => {
 
     const headings = screen.getAllByRole("heading", { level: 4 });
     expect(headings.map((heading) => heading.textContent)).toEqual([
-      "Product",
-      "Page",
+      "For product",
+      "For page",
     ]);
+    expect(counterGetTagCategories).toBe(1);
 
     const firstCategory = getCategoryContainer(1);
 
@@ -368,6 +366,21 @@ describe("Tags page - initialization", () => {
     const secondCategory = getCategoryContainer(2);
 
     expect(secondCategory).not.toHaveTextContent("T-Shirts");
+  });
+
+  it("does not display type headings when one type is configured", async () => {
+    storage.setItem("config", {
+      page_types: ["cms", "gallery", "main_page"],
+      langs: ["en", "pl"],
+      default_lang: "en",
+      cache_enable: 1,
+      is_shop: 0,
+      tag_entity_types: ["page"],
+    });
+
+    await setup();
+
+    expect(screen.queryByRole("heading", { level: 4 })).not.toBeInTheDocument();
   });
 });
 
@@ -628,6 +641,7 @@ describe("Tags page - add tag", () => {
     });
 
     expect(await screen.findByText("Skoora")).toBeInTheDocument();
+    expect(counterGetTagCategories).toBe(2);
   });
 });
 
@@ -733,8 +747,6 @@ describe("Tags page - delete tag", () => {
     await setup();
 
     expect(screen.getByText("Shoes")).toBeInTheDocument();
-    //await userEvent.click(screen.getByText("Shoes")); -- jak to odkomentuje to test zadziala - nie rozumem - przeciez tylko wystarczy kliknac  przyciks:     await userEvent.click(category.querySelector('[role="button_delete_tag"]')); - i nie trzeba klikac na ta kategorie ?? = nie rozumem tego
-
     confirmSpy.mockReturnValueOnce(true);
 
     const category = getCategoryContainer(1);
