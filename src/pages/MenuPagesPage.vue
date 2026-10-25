@@ -577,7 +577,7 @@ const saveEditPage = async () => {
       menu_id: menu_id.value,
       page_id: page_id.value,
       images: images.value,
-      tags: selectedPageTagIds.value.map(Number),
+      tags: selectedPageTagIds.value, //.map(Number),
     };
 
     const retPage = currentPageId.value
@@ -818,7 +818,7 @@ const getPageById = async (pageId) => {
       page_id.value = p.page_id;
       images.value = p.images;
       selectedPageTagIds.value = (p.tags || []).map((tag) =>
-        String(typeof tag === "object" ? tag.id : tag),
+        Number(typeof tag === "object" ? tag.id : tag),
       );
       tagToAdd.value = "";
 
@@ -948,32 +948,35 @@ const refreshPageTags = async () => {
 };
 
 const availablePageTags = computed(() =>
-  pageTags.value.filter(
-    (tag) => !selectedPageTagIds.value.includes(String(tag.id)),
-  ),
+  pageTags.value.filter((tag) => !selectedPageTagIds.value.includes(tag.id)),
 );
 
 const getPageTagName = (tagId) => {
-  const tag = pageTags.value.find((item) => String(item.id) === String(tagId));
+  const tag = pageTags.value.find((item) => item.id === tagId);
+
   return (
     tag?.name?.[lang.value] || tag?.name?.configDefaultLang || String(tagId)
   );
 };
 
 const addPageTag = () => {
+  const tagId = Number(tagToAdd.value);
+
   if (
-    tagToAdd.value &&
-    !selectedPageTagIds.value.includes(String(tagToAdd.value))
+    tagToAdd.value !== "" &&
+    Number.isInteger(tagId) &&
+    !selectedPageTagIds.value.includes(tagId)
   ) {
-    selectedPageTagIds.value.push(String(tagToAdd.value));
+    selectedPageTagIds.value.push(tagId);
   }
+
   tagToAdd.value = "";
 };
 
 const removePageTag = (tagId) => {
   if (window.confirm(`Remove tag "${getPageTagName(tagId)}" from this page?`)) {
     selectedPageTagIds.value = selectedPageTagIds.value.filter(
-      (id) => id !== String(tagId),
+      (id) => id !== tagId,
     );
   }
 };
