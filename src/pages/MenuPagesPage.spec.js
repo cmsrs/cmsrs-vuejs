@@ -106,7 +106,7 @@ const pages = [
     },
   },
   {
-    //2
+    //pages[2]
     id: 3,
     published: 1,
     commented: 0,
@@ -239,6 +239,7 @@ const menus = [
 let counter = 0;
 let counter2 = 0;
 let counterMenu = 0;
+let lastPageUpdate = null;
 const newPageId = 8;
 let server = setupServer(
   http.post("/api" + apiSecret + "/pages", async () => {
@@ -253,8 +254,9 @@ let server = setupServer(
     return HttpResponse.json(jsonRes);
   }),
 
-  http.put("/api" + apiSecret + "/pages/3", async () => {
+  http.put("/api" + apiSecret + "/pages/3", async ({ request }) => {
     counter2 += 1;
+    lastPageUpdate = await request.json();
     return HttpResponse.json({
       success: true,
     });
@@ -270,7 +272,10 @@ let server = setupServer(
   http.get("/api" + apiSecret + "/pages/3", async () => {
     const jsonRes = {
       success: true,
-      data: pages[2], //id = 3
+      data: {
+        ...pages[2],
+        tags: [{ id: 41, name: { en: "Topic" } }],
+      }, //id = 3
     };
 
     return HttpResponse.json(jsonRes);
@@ -292,6 +297,38 @@ let server = setupServer(
     };
 
     return HttpResponse.json(jsonRes);
+  }),
+
+  http.get("/api" + apiSecret + "/tag-categories", async () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        product: [
+          {
+            id: 10,
+            name: { en: "Product category" },
+            tags: [{ id: 91, name: { en: "Product tag" } }],
+          },
+        ],
+        page: [
+          {
+            id: 11,
+            name: { en: "Page category" },
+            tags: [
+              { id: 41, name: { en: "Topic" } },
+              { id: 42, name: { en: "News" } },
+            ],
+          },
+        ],
+      },
+    });
+  }),
+
+  http.get("/api" + apiSecret + "/pages/tag/41", async () => {
+    return HttpResponse.json({
+      success: true,
+      data: [{ id: 3 }, { id: 4 }],
+    });
   }),
 
   http.put("/api" + apiSecret + "/menus/1", async () => {
@@ -346,6 +383,7 @@ beforeEach(() => {
   counter = 0;
   counter2 = 0;
   counterMenu = 0;
+  lastPageUpdate = null;
   server.resetHandlers();
 });
 
@@ -402,6 +440,56 @@ describe("Pages page", () => {
         const header = screen.queryByRole("head_menu_pages");
         expect(header).toBeInTheDocument();
       });
+    });
+  });
+
+  describe("Page tag assignment", () => {
+    it("assigns multiple page tags and confirms before removing one", async () => {
+      await setup();
+      await waitForAjaxes();
+
+      //page id = 3
+      const pageThreeRow = screen.getByText("cms p333").closest(".test-page");
+      expect(pageThreeRow).not.toBeNull();
+      await userEvent.click(pageThreeRow.querySelector('[role="edit_page"]'));
+
+      await screen.findByTestId("page-tag-assignment");
+
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "Topic",
+      );
+      const tagSelect = screen.getByRole("page_tag_select");
+      expect(tagSelect).toHaveTextContent("News");
+      expect(tagSelect).not.toHaveTextContent("Product tag");
+      expect(tagSelect).not.toHaveTextContent("Page category");
+
+      await userEvent.selectOptions(tagSelect, "42");
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "Topic",
+      );
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "News",
+      );
+
+      confirmSpy.mockReturnValueOnce(false);
+      await userEvent.click(
+        screen.getByRole("button", { name: "Remove Topic" }),
+      );
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "Topic",
+      );
+
+      confirmSpy.mockReturnValueOnce(true);
+      await userEvent.click(
+        screen.getByRole("button", { name: "Remove Topic" }),
+      );
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
+        "Topic",
+      );
+
+      await userEvent.click(screen.getByRole("button_save_edit_page"));
+      await waitFor(() => expect(lastPageUpdate).not.toBeNull());
+      expect(lastPageUpdate.tags).toEqual([42]);
     });
   });
 

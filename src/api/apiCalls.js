@@ -59,6 +59,12 @@ export const getPage = (id, token) => {
   return axios.get("/api" + apiSecret + "/pages/" + id + "?token=" + token);
 };
 
+export const getPagesByTag = (tagId, token) => {
+  return axios.get(
+    "/api" + apiSecret + "/pages/tag/" + tagId + "?token=" + token,
+  );
+};
+
 export const postMenu = (post, token) => {
   return axios.post("/api" + apiSecret + "/menus?token=" + token, post);
 };

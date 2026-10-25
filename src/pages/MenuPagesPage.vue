@@ -264,6 +264,50 @@
               ></textarea>
             </div>
 
+            <div class="form-group mt-3" data-testid="page-tag-assignment">
+              <label for="pageTagSelect" class="text-secondary"
+                >Tags for this page:</label
+              >
+              <select
+                id="pageTagSelect"
+                class="form-control"
+                role="page_tag_select"
+                v-model="tagToAdd"
+                :disabled="pre_loader || availablePageTags.length === 0"
+                @change="addPageTag"
+              >
+                <option value="">Select a tag</option>
+                <option
+                  v-for="tag in availablePageTags"
+                  :key="tag.id"
+                  :value="String(tag.id)"
+                >
+                  {{
+                    tag.name?.[lang] || tag.name?.[configDefaultLang] || tag.id
+                  }}
+                </option>
+              </select>
+              <div class="mt-2" data-testid="assigned-page-tags">
+                <div
+                  v-for="tagId in selectedPageTagIds"
+                  :key="tagId"
+                  class="d-flex align-items-center mb-1"
+                  :data-assigned-tag-id="tagId"
+                >
+                  <span class="me-2">{{ getPageTagName(tagId) }}</span>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    :aria-label="`Remove ${getPageTagName(tagId)}`"
+                    :disabled="pre_loader"
+                    @click="removePageTag(tagId)"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div class="form-check mt-2 row">
               <label
                 :class="{ 'disabled-if-loader': pre_loader }"
@@ -428,7 +472,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import functions from "../helpers/functions.js";
 import cms from "../helpers/cms.js";
@@ -439,6 +483,7 @@ import {
   putPage,
   getPages,
   getPage,
+  getTagCategories,
   postMenu,
   getMenus,
   putMenu,
@@ -480,6 +525,11 @@ const notRelatedPages = ref(false);
 const innerPages = ref(false);
 const pagesBelongsToMenus = ref([]);
 const pagesBelongsToPages = ref([]);
+
+//tags
+const pageTags = ref([]);
+const selectedPageTagIds = ref([]);
+const tagToAdd = ref("");
 
 const title = ref({});
 const short_title = ref({});
@@ -527,6 +577,7 @@ const saveEditPage = async () => {
       menu_id: menu_id.value,
       page_id: page_id.value,
       images: images.value,
+      tags: selectedPageTagIds.value.map(Number),
     };
 
     const retPage = currentPageId.value
@@ -577,6 +628,8 @@ const clearDataPage = () => {
   menu_id.value = "";
   page_id.value = "";
   images.value = [];
+  selectedPageTagIds.value = [];
+  tagToAdd.value = "";
 
   currentPageId.value = false;
 
@@ -764,6 +817,10 @@ const getPageById = async (pageId) => {
       menu_id.value = p.menu_id;
       page_id.value = p.page_id;
       images.value = p.images;
+      selectedPageTagIds.value = (p.tags || []).map((tag) =>
+        String(typeof tag === "object" ? tag.id : tag),
+      );
+      tagToAdd.value = "";
 
       await childImageComponentRef.value.resetSelectedItems();
 
@@ -875,6 +932,52 @@ const refreshPages = async () => {
   return false;
 };
 
+const refreshPageTags = async () => {
+  try {
+    const response = await getTagCategories(token);
+    if (response.data.success) {
+      pageTags.value = (response.data.data?.page || []).flatMap((category) =>
+        (category.tags || []).map((tag) => ({ ...tag })),
+      );
+      return true;
+    }
+  } catch (error) {
+    console.log("error get page tags=", error);
+  }
+  return false;
+};
+
+const availablePageTags = computed(() =>
+  pageTags.value.filter(
+    (tag) => !selectedPageTagIds.value.includes(String(tag.id)),
+  ),
+);
+
+const getPageTagName = (tagId) => {
+  const tag = pageTags.value.find((item) => String(item.id) === String(tagId));
+  return (
+    tag?.name?.[lang.value] || tag?.name?.configDefaultLang || String(tagId)
+  );
+};
+
+const addPageTag = () => {
+  if (
+    tagToAdd.value &&
+    !selectedPageTagIds.value.includes(String(tagToAdd.value))
+  ) {
+    selectedPageTagIds.value.push(String(tagToAdd.value));
+  }
+  tagToAdd.value = "";
+};
+
+const removePageTag = (tagId) => {
+  if (window.confirm(`Remove tag "${getPageTagName(tagId)}" from this page?`)) {
+    selectedPageTagIds.value = selectedPageTagIds.value.filter(
+      (id) => id !== String(tagId),
+    );
+  }
+};
+
 const handleMenuChange = () => {
   rootPagesBelongToMenu.value = cms.getRootPages(
     menu_id.value,
@@ -903,6 +1006,7 @@ onMounted(async () => {
   pre_loader.value = true;
   const refreshM = await refreshMenus();
   const refreshP = await refreshPages();
+  await refreshPageTags();
 
   const pageId = router.currentRoute.value.params.id;
   if (pageId) {
