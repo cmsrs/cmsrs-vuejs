@@ -36,6 +36,17 @@ let pagesRequestCount = 0;
 let menusRequestCount = 0;
 
 let server = setupServer(
+
+  http.get("/api" + apiSecret + "/tag-categories", async () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        product: [],
+        page: [],        
+      },
+    });
+  }),  
+
   http.post("/api" + apiSecret + "/config/toggle-cache-enable-file", () => {
     counterToggle += 1;
     return HttpResponse.json(responseToggle);
@@ -84,6 +95,12 @@ beforeEach(() => {
   menusRequestCount = 0;
   server.resetHandlers();
 });
+
+afterEach(() => {
+  vi.clearAllMocks();
+  localStorage.clear();
+});
+
 
 afterAll(() => server.close());
 
@@ -227,6 +244,25 @@ describe("change cache in nav bar for demo version", () => {
 });
 
 describe("prevent redirect when user is auth", () => {
+
+  it("MSW intercepts tag categories", async () => {
+    const response = await fetch(
+      "http://localhost:3000/api/tag-categories?token=test",
+    );
+
+    expect(response.ok).toBe(true);
+
+    const data = await response.json();
+
+    expect(data).toEqual({
+      success: true,
+      data: {
+        product: [],
+        page: [],
+      },
+    });
+  });  
+  
   it("MSW intercepts menus", async () => {
     const response = await fetch("http://localhost:3000/api/menus?token=test");
 

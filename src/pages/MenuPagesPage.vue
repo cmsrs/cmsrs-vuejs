@@ -577,7 +577,7 @@ const saveEditPage = async () => {
       menu_id: menu_id.value,
       page_id: page_id.value,
       images: images.value,
-      tags: selectedPageTagIds.value, //.map(Number),
+      tags: selectedPageTagIds.value.map(Number),
     };
 
     const retPage = currentPageId.value
@@ -937,7 +937,7 @@ const refreshPageTags = async () => {
     const response = await getTagCategories(token);
     if (response.data.success) {
       pageTags.value = (response.data.data?.page || []).flatMap((category) =>
-        (category.tags || []).map((tag) => ({ ...tag })),
+        (category.tags || []).map((tag) => ({ ...tag, id: Number(tag.id) })),
       );
       return true;
     }
@@ -948,14 +948,14 @@ const refreshPageTags = async () => {
 };
 
 const availablePageTags = computed(() =>
-  pageTags.value.filter((tag) => !selectedPageTagIds.value.includes(tag.id)),
+  pageTags.value.filter((tag) => !selectedPageTagIds.value.includes(Number(tag.id))),
 );
 
 const getPageTagName = (tagId) => {
   const tag = pageTags.value.find((item) => item.id === tagId);
 
   return (
-    tag?.name?.[lang.value] || tag?.name?.configDefaultLang || String(tagId)
+    tag?.name?.[lang.value] || tag?.name?.[configDefaultLang] || String(tagId)
   );
 };
 
