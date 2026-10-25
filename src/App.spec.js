@@ -34,10 +34,12 @@ let counter = 0;
 
 let pagesRequestCount = 0;
 let menusRequestCount = 0;
+let tagCategoriesRequestCount = 0;
 
 let server = setupServer(
 
   http.get("/api" + apiSecret + "/tag-categories", async () => {
+    tagCategoriesRequestCount += 1;
     return HttpResponse.json({
       success: true,
       data: {
@@ -93,6 +95,7 @@ beforeEach(() => {
   counterToggle = 0;
   pagesRequestCount = 0;
   menusRequestCount = 0;
+  tagCategoriesRequestCount = 0;
   server.resetHandlers();
 });
 
@@ -325,6 +328,10 @@ describe("prevent redirect when user is auth", () => {
 
     await waitFor(() => {
       expect(menusRequestCount).toBe(1);
+    });
+
+    await waitFor(() => {
+      expect(tagCategoriesRequestCount).toBe(1);
     });
   });
 });
