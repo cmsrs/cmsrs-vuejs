@@ -408,15 +408,19 @@
                   :data-assigned-tag-id="tagId"
                 >
                   <span class="me-2">{{ getPageTagName(tagId) }}</span>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-outline-danger"
+                  <div
+                    role="del_page_tag"
+                    class="trash"
+                    :class="{ 'disabled-if-loader': pre_loader }"
                     :aria-label="`Remove ${getPageTagName(tagId)}`"
-                    :disabled="pre_loader"
                     @click="removePageTag(tagId)"
                   >
-                    Remove
-                  </button>
+                    <i
+                      class="fas fa-trash cursor-pointer"
+                      :title="`Remove ${getPageTagName(tagId)}`"
+                      aria-hidden="true"
+                    ></i>
+                  </div>
                 </div>
               </div>
             </div>
@@ -481,6 +485,7 @@ import { handleError } from "../helpers/common.js";
 import {
   postPage,
   putPage,
+  putPageTags,
   getPages,
   getPage,
   getTagCategories,
@@ -975,11 +980,34 @@ const addPageTag = () => {
   tagToAdd.value = "";
 };
 
-const removePageTag = (tagId) => {
-  if (window.confirm(`Remove tag "${getPageTagName(tagId)}" from this page?`)) {
-    selectedPageTagIds.value = selectedPageTagIds.value.filter(
+const removePageTag = async (tagId) => {
+  if (!window.confirm(`Remove tag "${getPageTagName(tagId)}" from this page?`)) {
+    return;
+  }
+
+  if (!currentPageId.value || !startLoading()) {
+    return;
+  }
+
+  try {
+    const remainingTagIds = selectedPageTagIds.value.filter(
       (id) => id !== tagId,
     );
+    const response = await putPageTags(
+      remainingTagIds,
+      currentPageId.value,
+      token,
+    );
+
+    if (response.data.success) {
+      selectedPageTagIds.value = remainingTagIds;
+    } else {
+      msgWrong.value = functions.parseError(response.data.error);
+    }
+  } catch (error) {
+    handleError(error, config.demo_status, msgWrong, pre_loader);
+  } finally {
+    pre_loader.value = false;
   }
 };
 

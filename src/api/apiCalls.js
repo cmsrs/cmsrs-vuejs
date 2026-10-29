@@ -43,6 +43,13 @@ export const putPage = (post, id, token) => {
   );
 };
 
+export const putPageTags = (tags, id, token) => {
+  return axios.put(
+    "/api" + apiSecret + "/pages/" + id + "/tags?token=" + token,
+    { tags },
+  );
+};
+
 export const getPages = (token) => {
   return axios.get("/api" + apiSecret + "/pages?token=" + token);
 };

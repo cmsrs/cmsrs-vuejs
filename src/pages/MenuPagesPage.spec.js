@@ -128,6 +128,7 @@ const pages = [
       en: "page connected to menu 1a",
     },
     images: images,
+    tags: [41, 42]
   },
   {
     id: 4,
@@ -239,8 +240,13 @@ const menus = [
 let counter = 0;
 let counter2 = 0;
 let counterMenu = 0;
+let counterPutPageTags = 0;
+let counterDeleteMenu = 0;
+let counterDeletePage = 0;
 let lastPageCreate = null;
 let lastPageUpdate = null;
+let lastPageTagsUpdate = null;
+let pageThreeTags = [41];
 const newPageId = 8;
 let server = setupServer(
   http.post("/api" + apiSecret + "/pages", async ({ request }) => {
@@ -264,6 +270,17 @@ let server = setupServer(
     });
   }),
 
+  http.put(
+    "/api" + apiSecret + "/pages/3/tags",
+    async ({ request }) => {
+      counterPutPageTags += 1;
+      lastPageTagsUpdate = await request.json();
+      pageThreeTags = lastPageTagsUpdate.tags;
+
+      return HttpResponse.json({ success: true });
+    },
+  ),
+
   http.post("/api" + apiSecret + "/menus", async () => {
     counterMenu += 1;
     return HttpResponse.json({
@@ -276,7 +293,10 @@ let server = setupServer(
       success: true,
       data: {
         ...pages[2],
-        tags: [{ id: 41, name: { en: "Topic" } }],
+        tags: pageThreeTags.map((id) => ({
+          id,
+          name: { en: id === 41 ? "Topic" : "News" },
+        })),
       }, //id = 3
     };
 
@@ -341,12 +361,14 @@ let server = setupServer(
   }),
 
   http.delete("/api" + apiSecret + "/menus/1", async () => {
+    counterDeleteMenu += 1;
     return HttpResponse.json({
       success: true,
     });
   }),
 
   http.delete("/api" + apiSecret + "/pages/3", async () => {
+    counterDeletePage += 1;
     return HttpResponse.json({
       success: true,
     });
@@ -385,8 +407,13 @@ beforeEach(() => {
   counter = 0;
   counter2 = 0;
   counterMenu = 0;
+  counterPutPageTags = 0;
+  counterDeleteMenu = 0;
+  counterDeletePage = 0;
   lastPageCreate = null;
   lastPageUpdate = null;
+  lastPageTagsUpdate = null;
+  pageThreeTags = [41];
   server.resetHandlers();
 });
 
@@ -488,6 +515,7 @@ describe("Pages page", () => {
       );
       const tagSelect = screen.getByRole("page_tag_select");
       expect(tagSelect).toHaveTextContent("News");
+      expect(tagSelect).toHaveTextContent("Topic");      
       expect(tagSelect).not.toHaveTextContent("Product tag");
       expect(tagSelect).not.toHaveTextContent("Page category");
 
@@ -501,19 +529,34 @@ describe("Pages page", () => {
 
       confirmSpy.mockReturnValueOnce(false);
       await userEvent.click(
-        screen.getByRole("button", { name: "Remove Topic" }),
+        screen
+          .getByTestId("assigned-page-tags")
+          .querySelector('[data-assigned-tag-id="41"] [role="del_page_tag"]'),
       );
       expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
         "Topic",
       );
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "News",
+      );
+
+      expect(counterPutPageTags).toBe(0);
 
       confirmSpy.mockReturnValueOnce(true);
       await userEvent.click(
-        screen.getByRole("button", { name: "Remove Topic" }),
+        screen
+          .getByTestId("assigned-page-tags")
+          .querySelector('[data-assigned-tag-id="41"] [role="del_page_tag"]'),
       );
       expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
         "Topic",
       );
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "News",
+      );
+
+      await waitFor(() => expect(counterPutPageTags).toBe(1));
+      expect(lastPageTagsUpdate).toEqual({ tags: [42] }); //news
 
       await userEvent.click(screen.getByRole("button_save_edit_page"));
       await waitFor(() => expect(lastPageUpdate).not.toBeNull());
@@ -1049,6 +1092,7 @@ describe("Pages page", () => {
         const alertSuccessAfter = screen.queryByRole("alert_success");
         expect(alertSuccessAfter).toBeInTheDocument();
       });
+      expect(counterDeleteMenu).toBe(1);
     });
 
     it("show pages belongs to each menu", async () => {
@@ -1243,6 +1287,7 @@ describe("Pages page", () => {
         const alertSuccessAfter = screen.queryByRole("alert_success");
         expect(alertSuccessAfter).toBeInTheDocument();
       });
+      expect(counterDeletePage).toBe(1);
     });
 
     it("page change position up", async () => {
