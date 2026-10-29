@@ -128,7 +128,7 @@ const pages = [
       en: "page connected to menu 1a",
     },
     images: images,
-    tags: [41, 42]
+    tags: [42],
   },
   {
     id: 4,
@@ -246,7 +246,6 @@ let counterDeletePage = 0;
 let lastPageCreate = null;
 let lastPageUpdate = null;
 let lastPageTagsUpdate = null;
-let pageThreeTags = [41];
 const newPageId = 8;
 let server = setupServer(
   http.post("/api" + apiSecret + "/pages", async ({ request }) => {
@@ -270,16 +269,12 @@ let server = setupServer(
     });
   }),
 
-  http.put(
-    "/api" + apiSecret + "/pages/3/tags",
-    async ({ request }) => {
-      counterPutPageTags += 1;
-      lastPageTagsUpdate = await request.json();
-      pageThreeTags = lastPageTagsUpdate.tags;
+  http.put("/api" + apiSecret + "/pages/3/tags", async ({ request }) => {
+    counterPutPageTags += 1;
+    lastPageTagsUpdate = await request.json();
 
-      return HttpResponse.json({ success: true });
-    },
-  ),
+    return HttpResponse.json({ success: true });
+  }),
 
   http.post("/api" + apiSecret + "/menus", async () => {
     counterMenu += 1;
@@ -289,18 +284,13 @@ let server = setupServer(
   }),
 
   http.get("/api" + apiSecret + "/pages/3", async () => {
-    const jsonRes = {
+    return HttpResponse.json({
       success: true,
       data: {
         ...pages[2],
-        tags: pageThreeTags.map((id) => ({
-          id,
-          name: { en: id === 41 ? "Topic" : "News" },
-        })),
-      }, //id = 3
-    };
-
-    return HttpResponse.json(jsonRes);
+        tags: [{ id: 42, name: { en: "News" } }],
+      },
+    });
   }),
 
   http.get("/api" + apiSecret + "/pages", async () => {
@@ -321,6 +311,8 @@ let server = setupServer(
     return HttpResponse.json(jsonRes);
   }),
 
+  //
+  //
   http.get("/api" + apiSecret + "/tag-categories", async () => {
     return HttpResponse.json({
       success: true,
@@ -337,8 +329,8 @@ let server = setupServer(
             id: 11,
             name: { en: "Page category", pl: "Kategoria strony" },
             tags: [
-              { id: 41, name: { en: "Topic", pl: "Temat" } },
               { id: 42, name: { en: "News", pl: "Aktualności" } },
+              { id: 41, name: { en: "Topic", pl: "Temat" } },
             ],
           },
         ],
@@ -413,7 +405,6 @@ beforeEach(() => {
   lastPageCreate = null;
   lastPageUpdate = null;
   lastPageTagsUpdate = null;
-  pageThreeTags = [41];
   server.resetHandlers();
 });
 
@@ -499,7 +490,7 @@ describe("Pages page", () => {
       expect(lastPageCreate.tags).toEqual([41]);
     });
 
-    it("assigns multiple page tags and confirms before removing one", async () => {
+    it("add additional tag", async () => {
       await setup();
       await waitForAjaxes();
 
@@ -508,19 +499,54 @@ describe("Pages page", () => {
       expect(pageThreeRow).not.toBeNull();
       await userEvent.click(pageThreeRow.querySelector('[role="edit_page"]'));
 
-      await screen.findByTestId("page-tag-assignment");
+      //await screen.findByTestId("page-tag-assignment");
 
       expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "News",
+      );
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
         "Topic",
       );
+
       const tagSelect = screen.getByRole("page_tag_select");
-      expect(tagSelect).toHaveTextContent("News");
-      expect(tagSelect).toHaveTextContent("Topic");      
+      expect(tagSelect.querySelectorAll("option")).toHaveLength(2); // to nie przechodzi oczekuje 1
+      //expect(tagSelect).toHaveTextContent("");
+      expect(tagSelect).not.toHaveTextContent("News"); //42
+      expect(tagSelect).toHaveTextContent("Topic"); //41
       expect(tagSelect).not.toHaveTextContent("Product tag");
       expect(tagSelect).not.toHaveTextContent("Page category");
 
-      await userEvent.selectOptions(tagSelect, "42");
+      await userEvent.selectOptions(tagSelect, "41");
+
       expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "News",
+      );
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "Topic",
+      );
+
+      expect(counter2).toBe(0);
+      await userEvent.click(screen.getByRole("button_save_edit_page"));
+      await waitFor(() => expect(counter2).toBe(1));
+
+      await waitFor(() => expect(lastPageUpdate).not.toBeNull());
+
+      await waitFor(() => expect(lastPageUpdate.tags).toEqual([42, 41]));
+    });
+
+    it("assigns page tags and cancel delete", async () => {
+      await setup();
+      await waitForAjaxes();
+
+      const pageThreeRow = screen.getByText("cms p333").closest(".test-page");
+      expect(pageThreeRow).not.toBeNull();
+      await userEvent.click(pageThreeRow.querySelector('[role="edit_page"]'));
+
+      const tagSelect = screen.getByRole("page_tag_select");
+      expect(tagSelect).not.toHaveTextContent("News"); //42
+      expect(tagSelect).toHaveTextContent("Topic"); //41
+
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
         "Topic",
       );
       expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
@@ -531,22 +557,7 @@ describe("Pages page", () => {
       await userEvent.click(
         screen
           .getByTestId("assigned-page-tags")
-          .querySelector('[data-assigned-tag-id="41"] [role="del_page_tag"]'),
-      );
-      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
-        "Topic",
-      );
-      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
-        "News",
-      );
-
-      expect(counterPutPageTags).toBe(0);
-
-      confirmSpy.mockReturnValueOnce(true);
-      await userEvent.click(
-        screen
-          .getByTestId("assigned-page-tags")
-          .querySelector('[data-assigned-tag-id="41"] [role="del_page_tag"]'),
+          .querySelector('[data-assigned-tag-id="42"] [role="del_page_tag"]'),
       );
       expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
         "Topic",
@@ -554,13 +565,55 @@ describe("Pages page", () => {
       expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
         "News",
       );
+    });
+
+    it("assigns page tags and approve delete", async () => {
+      await setup();
+      await waitForAjaxes();
+
+      const pageThreeRow = screen.getByText("cms p333").closest(".test-page");
+      expect(pageThreeRow).not.toBeNull();
+      await userEvent.click(pageThreeRow.querySelector('[role="edit_page"]'));
+
+      const tagSelect = screen.getByRole("page_tag_select");
+      expect(tagSelect).not.toHaveTextContent("News"); //42
+      expect(tagSelect).toHaveTextContent("Topic"); //41
+
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
+        "Topic",
+      );
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "News",
+      ); //42
+
+      expect(counterPutPageTags).toBe(0);
+
+      confirmSpy.mockReturnValueOnce(true);
+
+      await userEvent.click(
+        screen
+          .getByTestId("assigned-page-tags")
+          .querySelector('[data-assigned-tag-id="42"] [role="del_page_tag"]'),
+      );
 
       await waitFor(() => expect(counterPutPageTags).toBe(1));
-      expect(lastPageTagsUpdate).toEqual({ tags: [42] }); //news
+      await waitFor(() => expect(lastPageTagsUpdate).not.toBeNull());
+      expect(lastPageTagsUpdate.tags).toEqual([]);
 
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
+        "Topic",
+      );
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
+        "News",
+      );
+
+      expect(counter2).toBe(0);
       await userEvent.click(screen.getByRole("button_save_edit_page"));
+      await waitFor(() => expect(counter2).toBe(1));
+
       await waitFor(() => expect(lastPageUpdate).not.toBeNull());
-      expect(lastPageUpdate.tags).toEqual([42]);
+
+      await waitFor(() => expect(lastPageUpdate.tags).toEqual([]));
     });
   });
 

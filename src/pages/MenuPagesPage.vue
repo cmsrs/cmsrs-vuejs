@@ -981,7 +981,9 @@ const addPageTag = () => {
 };
 
 const removePageTag = async (tagId) => {
-  if (!window.confirm(`Remove tag "${getPageTagName(tagId)}" from this page?`)) {
+  if (
+    !window.confirm(`Remove tag "${getPageTagName(tagId)}" from this page?`)
+  ) {
     return;
   }
 
