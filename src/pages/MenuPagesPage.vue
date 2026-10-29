@@ -987,14 +987,20 @@ const removePageTag = async (tagId) => {
     return;
   }
 
-  if (!currentPageId.value || !startLoading()) {
+  const remainingTagIds = selectedPageTagIds.value.filter((id) => id !== tagId);
+
+  // A page being created has no server ID yet, so its tag changes are saved
+  // together with the page instead of through the page-tags endpoint.
+  if (!currentPageId.value) {
+    selectedPageTagIds.value = remainingTagIds;
+    return;
+  }
+
+  if (!startLoading()) {
     return;
   }
 
   try {
-    const remainingTagIds = selectedPageTagIds.value.filter(
-      (id) => id !== tagId,
-    );
     const response = await putPageTags(
       remainingTagIds,
       currentPageId.value,

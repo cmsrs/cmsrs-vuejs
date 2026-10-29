@@ -490,6 +490,56 @@ describe("Pages page", () => {
       expect(lastPageCreate.tags).toEqual([41]);
     });
 
+    it("saves tag removal when creating a new page", async () => {
+      await setup();
+      await waitForAjaxes();
+
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
+        "News",
+      );
+
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
+        "Topic",
+      );
+
+      const tagSelect = screen.getByRole("page_tag_select");
+      await userEvent.selectOptions(tagSelect, "41");
+
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
+        "News",
+      );
+
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "Topic",
+      ); //41
+
+      confirmSpy.mockReturnValueOnce(true);
+      await userEvent.click(
+        screen
+          .getByTestId("assigned-page-tags")
+          .querySelector('[data-assigned-tag-id="41"] [role="del_page_tag"]'),
+      );
+
+      expect(screen.getByTestId("assigned-page-tags")).not.toHaveTextContent(
+        "Topic",
+      );
+
+      await userEvent.type(screen.getByPlaceholderText("title en"), "New page");
+      await userEvent.type(
+        screen.getByPlaceholderText("short title en"),
+        "new-page",
+      );
+      expect(counter).toBe(0);
+
+      await userEvent.click(screen.getByRole("button_save_edit_page"));
+
+      await waitFor(() => expect(counter).toBe(1));
+      await waitFor(() => expect(lastPageCreate).not.toBeNull());
+      await waitFor(() => expect(lastPageCreate.tags).toEqual([]));
+
+      expect(counterPutPageTags).toBe(0);
+    });
+
     it("add additional tag", async () => {
       await setup();
       await waitForAjaxes();
