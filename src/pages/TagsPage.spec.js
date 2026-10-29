@@ -736,7 +736,7 @@ describe("Tags page - delete tag", () => {
 
     const category = getCategoryContainer(1);
 
-    await userEvent.click(category.querySelector('[role="button_delete_tag"]'));
+    await userEvent.click(category.querySelector('[role="del_tag"]'));
 
     expect(confirmSpy).toHaveBeenCalledOnce();
     expect(counterDeleteTag).toBe(0);
@@ -751,7 +751,7 @@ describe("Tags page - delete tag", () => {
 
     const category = getCategoryContainer(1);
 
-    await userEvent.click(category.querySelector('[role="button_delete_tag"]'));
+    await userEvent.click(category.querySelector('[role="del_tag"]'));
 
     await waitFor(() => {
       expect(counterDeleteTag).toBe(1);
@@ -771,7 +771,7 @@ describe("Tags page - delete tag", () => {
 
     const category = getCategoryContainer(1);
 
-    await userEvent.click(category.querySelector('[role="button_delete_tag"]'));
+    await userEvent.click(category.querySelector('[role="del_tag"]'));
 
     expect(counterDeleteTag).toBe(0);
     expect(screen.getByText("Shoes")).toBeInTheDocument();

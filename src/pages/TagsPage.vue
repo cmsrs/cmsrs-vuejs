@@ -72,7 +72,7 @@
                     class="form-group col-4"
                   >
                     <select
-                      class="form-control"
+                      class="rs-select form-control"
                       :class="{
                         'is-invalid':
                           categoryErrors[category.id]?.includes('entity_type'),
@@ -80,7 +80,7 @@
                       :disabled="pre_loader"
                       v-model="category.entity_type"
                     >
-                      <option value="">Select type</option>
+                      <option value=""></option>
 
                       <option
                         v-for="entityType in tagEntityTypes"
@@ -128,13 +128,16 @@
                     @click="editTag(tag)"
                   >
                     <!-- Delete tag -->
-                    <div class="col-1 trash">
+                    <div
+                      class="col-1 trash"
+                      role="del_tag"
+                      :class="{ 'disabled-if-loader': pre_loader }"
+                      @click.stop="deleteTag(tag)"
+                    >
                       <i
                         class="fas fa-trash cursor-pointer"
-                        :class="{ 'disabled-if-loader': pre_loader }"
                         title="Delete tag"
-                        role="button_delete_tag"
-                        @click.stop="deleteTag(tag)"
+                        aria-hidden="true"
                       ></i>
                     </div>
 
@@ -184,11 +187,11 @@
 
               <div v-if="tagEntityTypes.length > 1" class="form-group col-4">
                 <select
-                  class="form-control"
+                  class="rs-select form-control"
                   v-model="newCategory.entity_type"
                   :disabled="pre_loader"
                 >
-                  <option value="">Select type</option>
+                  <option value=""></option>
 
                   <option
                     v-for="entityType in tagEntityTypes"
@@ -277,14 +280,14 @@
 
               <select
                 id="tagCategory"
-                class="form-control"
+                class="rs-select form-control"
                 :class="{
                   'is-invalid': tagErrors.includes('tag_category_id'),
                 }"
                 v-model="tagCategoryId"
                 :disabled="pre_loader"
               >
-                <option value="">Select category</option>
+                <option value=""></option>
 
                 <option
                   v-for="category in categories"
