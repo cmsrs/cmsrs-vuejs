@@ -59,12 +59,6 @@ export const getPage = (id, token) => {
   return axios.get("/api" + apiSecret + "/pages/" + id + "?token=" + token);
 };
 
-export const getPagesByTag = (tagId, token) => {
-  return axios.get(
-    "/api" + apiSecret + "/pages/tag/" + tagId + "?token=" + token,
-  );
-};
-
 export const postMenu = (post, token) => {
   return axios.post("/api" + apiSecret + "/menus?token=" + token, post);
 };
@@ -362,13 +356,13 @@ export const postTag = (post, token) => {
   return ret;
 };
 
-export const getTags = (token) => {
-  return axios.get("/api" + apiSecret + "/tags?token=" + token);
-};
+// export const getTags = (token) => {
+//   return axios.get("/api" + apiSecret + "/tags?token=" + token);
+// };
 
-export const getTag = (id, token) => {
-  return axios.get("/api" + apiSecret + "/tags/" + id + "?token=" + token);
-};
+// export const getTag = (id, token) => {
+//   return axios.get("/api" + apiSecret + "/tags/" + id + "?token=" + token);
+// };
 
 export const putTag = (post, id, token) => {
   return axios.put(

@@ -239,11 +239,13 @@ const menus = [
 let counter = 0;
 let counter2 = 0;
 let counterMenu = 0;
+let lastPageCreate = null;
 let lastPageUpdate = null;
 const newPageId = 8;
 let server = setupServer(
-  http.post("/api" + apiSecret + "/pages", async () => {
+  http.post("/api" + apiSecret + "/pages", async ({ request }) => {
     counter += 1;
+    lastPageCreate = await request.json();
     const jsonRes = {
       success: true,
       data: {
@@ -306,17 +308,19 @@ let server = setupServer(
         product: [
           {
             id: 10,
-            name: { en: "Product category" },
-            tags: [{ id: 91, name: { en: "Product tag" } }],
+            name: { en: "Product category", pl: "Kategoria produktu" },
+            tags: [
+              { id: 91, name: { en: "Product tag", pl: "Tag produktu" } },
+            ],
           },
         ],
         page: [
           {
             id: 11,
-            name: { en: "Page category" },
+            name: { en: "Page category", pl: "Kategoria strony" },
             tags: [
-              { id: 41, name: { en: "Topic" } },
-              { id: 42, name: { en: "News" } },
+              { id: 41, name: { en: "Topic", pl: "Temat" } },
+              { id: 42, name: { en: "News", pl: "Aktualności" } },
             ],
           },
         ],
@@ -383,6 +387,7 @@ beforeEach(() => {
   counter = 0;
   counter2 = 0;
   counterMenu = 0;
+  lastPageCreate = null;
   lastPageUpdate = null;
   server.resetHandlers();
 });
@@ -444,6 +449,31 @@ describe("Pages page", () => {
   });
 
   describe("Page tag assignment", () => {
+    it("loads page tags in the dropdown and saves selected tags when creating a page", async () => {
+      await setup();
+      await waitForAjaxes();
+
+      const tagSelect = screen.getByRole("page_tag_select");
+      expect(tagSelect).toHaveTextContent("Topic");
+      expect(tagSelect).toHaveTextContent("News");
+      expect(tagSelect).not.toHaveTextContent("Product tag");
+
+      await userEvent.selectOptions(tagSelect, "41");
+      expect(screen.getByTestId("assigned-page-tags")).toHaveTextContent(
+        "Topic",
+      );
+
+      await userEvent.type(screen.getByPlaceholderText("title en"), "New page");
+      await userEvent.type(
+        screen.getByPlaceholderText("short title en"),
+        "new-page",
+      );
+      await userEvent.click(screen.getByRole("button_save_edit_page"));
+
+      await waitFor(() => expect(lastPageCreate).not.toBeNull());
+      expect(lastPageCreate.tags).toEqual([41]);
+    });
+
     it("assigns multiple page tags and confirms before removing one", async () => {
       await setup();
       await waitForAjaxes();
