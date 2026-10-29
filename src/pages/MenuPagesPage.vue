@@ -264,50 +264,6 @@
               ></textarea>
             </div>
 
-            <div class="form-group mt-3" data-testid="page-tag-assignment">
-              <label for="pageTagSelect" class="text-secondary"
-                >Tags for this page:</label
-              >
-              <select
-                id="pageTagSelect"
-                class="form-control"
-                role="page_tag_select"
-                v-model="tagToAdd"
-                :disabled="pre_loader || availablePageTags.length === 0"
-                @change="addPageTag"
-              >
-                <option value="">Select a tag</option>
-                <option
-                  v-for="tag in availablePageTags"
-                  :key="tag.id"
-                  :value="String(tag.id)"
-                >
-                  {{
-                    tag.name?.[lang] || tag.name?.[configDefaultLang] || tag.id
-                  }}
-                </option>
-              </select>
-              <div class="mt-2" data-testid="assigned-page-tags">
-                <div
-                  v-for="tagId in selectedPageTagIds"
-                  :key="tagId"
-                  class="d-flex align-items-center mb-1"
-                  :data-assigned-tag-id="tagId"
-                >
-                  <span class="me-2">{{ getPageTagName(tagId) }}</span>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-outline-danger"
-                    :aria-label="`Remove ${getPageTagName(tagId)}`"
-                    :disabled="pre_loader"
-                    @click="removePageTag(tagId)"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <div class="form-check mt-2 row">
               <label
                 :class="{ 'disabled-if-loader': pre_loader }"
@@ -418,6 +374,50 @@
                     {{ page.short_title[lang] }}
                   </option>
                 </select>
+              </div>
+            </div>
+
+            <div class="form-group mt-3" data-testid="page-tag-assignment">
+              <label for="pageTagSelect" class="text-secondary"
+                >Tags for this page:</label
+              >
+              <select
+                id="pageTagSelect"
+                class="rs-select form-control"
+                role="page_tag_select"
+                v-model="tagToAdd"
+                :disabled="pre_loader || availablePageTags.length === 0"
+                @change="addPageTag"
+              >
+                <option value=""></option>
+                <option
+                  v-for="tag in availablePageTags"
+                  :key="tag.id"
+                  :value="String(tag.id)"
+                >
+                  {{
+                    tag.name?.[lang] || tag.name?.[configDefaultLang] || tag.id
+                  }}
+                </option>
+              </select>
+              <div class="mt-2" data-testid="assigned-page-tags">
+                <div
+                  v-for="tagId in selectedPageTagIds"
+                  :key="tagId"
+                  class="d-flex align-items-center mb-1"
+                  :data-assigned-tag-id="tagId"
+                >
+                  <span class="me-2">{{ getPageTagName(tagId) }}</span>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-outline-danger"
+                    :aria-label="`Remove ${getPageTagName(tagId)}`"
+                    :disabled="pre_loader"
+                    @click="removePageTag(tagId)"
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -948,7 +948,9 @@ const refreshPageTags = async () => {
 };
 
 const availablePageTags = computed(() =>
-  pageTags.value.filter((tag) => !selectedPageTagIds.value.includes(Number(tag.id))),
+  pageTags.value.filter(
+    (tag) => !selectedPageTagIds.value.includes(Number(tag.id)),
+  ),
 );
 
 const getPageTagName = (tagId) => {

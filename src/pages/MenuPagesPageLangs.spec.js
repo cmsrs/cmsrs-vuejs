@@ -65,10 +65,9 @@ let server = setupServer(
   http.get("/api" + apiSecret + "/tag-categories", async () => {
     return HttpResponse.json({
       success: true,
-      data: {
-      },
+      data: {},
     });
-  }),  
+  }),
 
   http.get("/api" + apiSecret + "/pages/1", async () => {
     counter += 1;

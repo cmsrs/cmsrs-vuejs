@@ -309,9 +309,7 @@ let server = setupServer(
           {
             id: 10,
             name: { en: "Product category", pl: "Kategoria produktu" },
-            tags: [
-              { id: 91, name: { en: "Product tag", pl: "Tag produktu" } },
-            ],
+            tags: [{ id: 91, name: { en: "Product tag", pl: "Tag produktu" } }],
           },
         ],
         page: [
