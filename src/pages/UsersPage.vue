@@ -194,11 +194,7 @@ const searchClients = async () => {
   page.value = "1";
   search.value = searchValue.value;
 
-  const refreshC = await refreshClients();
-
-  if (refreshC) {
-    pre_loader.value = false;
-  }
+  await refreshClients();
 };
 
 const delClient = async (id) => {
@@ -227,11 +223,7 @@ const changePageByUrl = async (url) => {
   pre_loader.value = true;
   page.value = functions.retrieveParamsFromUrl(url, "page");
 
-  const refreshC = await refreshClients();
-
-  if (refreshC) {
-    pre_loader.value = false;
-  }
+  await refreshClients();
 };
 
 const sortingAsc = async (column) => {
@@ -248,11 +240,7 @@ const sorting = async (col, dir) => {
   direction.value = dir;
   page.value = "1";
 
-  const refreshC = await refreshClients();
-
-  if (refreshC) {
-    pre_loader.value = false;
-  }
+  await refreshClients();
 };
 
 const clearMsg = () => {
@@ -274,6 +262,8 @@ const refreshClients = async () => {
     return true;
   } catch (error) {
     console.log("error get clients=", error);
+  } finally {
+    pre_loader.value = false;
   }
   return false;
 };
@@ -292,10 +282,6 @@ onMounted(async () => {
   page.value = "1";
   search.value = "";
 
-  const refreshC = await refreshClients();
-
-  if (refreshC) {
-    pre_loader.value = false;
-  }
+  await refreshClients();
 });
 </script>

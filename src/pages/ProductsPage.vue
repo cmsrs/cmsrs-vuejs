@@ -295,11 +295,7 @@ async function changeLang(inLang) {
   lang.value = inLang;
   setDefaultLang(inLang);
 
-  const refreshP = await refreshProducts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshProducts();
 }
 
 const searchProducts = async () => {
@@ -307,11 +303,7 @@ const searchProducts = async () => {
   page.value = "1";
   search.value = searchValue.value;
 
-  const refreshP = await refreshProducts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshProducts();
 };
 
 const goToPage = (pageId) => {
@@ -344,11 +336,7 @@ const changePageByUrl = async (url) => {
   pre_loader.value = true;
   page.value = functions.retrieveParamsFromUrl(url, "page");
 
-  const refreshP = await refreshProducts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshProducts();
 };
 
 const sortingAsc = async (column) => {
@@ -365,11 +353,7 @@ const sorting = async (col, dir) => {
   direction.value = dir;
   page.value = "1";
 
-  const refreshP = await refreshProducts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshProducts();
 };
 
 const clearMsg = () => {
@@ -392,6 +376,8 @@ const refreshProducts = async () => {
     return true;
   } catch (error) {
     console.log("error get products=", error);
+  } finally {
+    pre_loader.value = false;
   }
   return false;
 };
@@ -415,10 +401,6 @@ onMounted(async () => {
   page.value = "1";
   search.value = "";
 
-  const refreshP = await refreshProducts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshProducts();
 });
 </script>

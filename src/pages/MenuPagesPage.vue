@@ -606,10 +606,7 @@ const saveEditPage = async () => {
       msgWrong.value = "Something wrong";
     }
 
-    const ret = await refreshPages();
-    if (ret) {
-      pre_loader.value = false;
-    }
+    await refreshPages();
   } catch (error) {
     handleError(error, config.demo_status, msgWrong, pre_loader);
   }
@@ -747,7 +744,6 @@ async function delMenu(index) {
           const ret = await refreshMenus();
           if (ret) {
             msgGood.value = "Menu has been deleted";
-            pre_loader.value = false;
           }
         }
       } catch (error) {
@@ -785,7 +781,6 @@ const positionMenu = async (direction, menuId) => {
       const ret = await refreshMenus();
       if (ret) {
         msgGood.value = "Position menu has been changed";
-        pre_loader.value = false;
       }
     }
   } catch (error) {
@@ -908,7 +903,7 @@ const positionPage = async (direction, pageId) => {
   }
 };
 
-const refreshMenus = async () => {
+const refreshMenus = async (finishLoading = true) => {
   try {
     const responseM = await getMenus(token);
     menus.value = responseM.data.data;
@@ -916,11 +911,15 @@ const refreshMenus = async () => {
   } catch (error) {
     //handleError(error, config.demo_status, msgWrong, pre_loader);
     console.log("error get menu=", error);
+  } finally {
+    if (finishLoading) {
+      pre_loader.value = false;
+    }
   }
   return false;
 };
 
-const refreshPages = async () => {
+const refreshPages = async (finishLoading = true) => {
   try {
     const responseP = await getPages(token);
     allPages.value = responseP.data.data;
@@ -933,11 +932,15 @@ const refreshPages = async () => {
   } catch (error) {
     //handleError(error, config.demo_status, msgWrong, pre_loader);
     console.log("error get pages=", error);
+  } finally {
+    if (finishLoading) {
+      pre_loader.value = false;
+    }
   }
   return false;
 };
 
-const refreshPageTags = async () => {
+const refreshPageTags = async (finishLoading = true) => {
   try {
     const response = await getTagCategories(token);
     if (response.data.success) {
@@ -948,6 +951,10 @@ const refreshPageTags = async () => {
     }
   } catch (error) {
     console.log("error get page tags=", error);
+  } finally {
+    if (finishLoading) {
+      pre_loader.value = false;
+    }
   }
   return false;
 };
@@ -1045,23 +1052,21 @@ onMounted(async () => {
   }
 
   pre_loader.value = true;
-  const refreshM = await refreshMenus();
-  const refreshP = await refreshPages();
-  await refreshPageTags();
+  try {
+    await Promise.all([
+      refreshMenus(false),
+      refreshPages(false),
+      refreshPageTags(false),
+    ]);
 
-  const pageId = router.currentRoute.value.params.id;
-  if (pageId) {
-    currentPageId.value = parseInt(pageId);
-    await childImageComponentRef.value.resetSelectedItems();
-
-    const getSomePage = await getPageById(pageId);
-    if (refreshM && refreshP && getSomePage) {
-      pre_loader.value = false;
+    const pageId = router.currentRoute.value.params.id;
+    if (pageId) {
+      currentPageId.value = parseInt(pageId);
+      await childImageComponentRef.value.resetSelectedItems();
+      await getPageById(pageId);
     }
-  } else {
-    if (refreshM && refreshP) {
-      pre_loader.value = false;
-    }
+  } finally {
+    pre_loader.value = false;
   }
 });
 

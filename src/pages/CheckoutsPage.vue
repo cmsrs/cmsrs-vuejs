@@ -229,6 +229,8 @@ const editCheckout = async (id) => {
     handleError(error, config.demo_status, msgWrong, pre_loader);
     //msgWrong.value = "Sth wrong with edit checkout (error)";
     //console.log("error putCheckout", error);
+  } finally {
+    pre_loader.value = false;
   }
   return false;
 };
@@ -238,11 +240,7 @@ async function changeLang(inLang) {
   lang.value = inLang;
   setDefaultLang(inLang);
 
-  const refreshP = await refreshCheckouts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshCheckouts();
 }
 
 const searchCheckouts = async () => {
@@ -250,22 +248,14 @@ const searchCheckouts = async () => {
   page.value = "1";
   search.value = searchValue.value;
 
-  const refreshP = await refreshCheckouts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshCheckouts();
 };
 
 const changePageByUrl = async (url) => {
   pre_loader.value = true;
   page.value = functions.retrieveParamsFromUrl(url, "page");
 
-  const refreshP = await refreshCheckouts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshCheckouts();
 };
 
 const sortingAsc = async (column) => {
@@ -282,11 +272,7 @@ const sorting = async (col, dir) => {
   direction.value = dir;
   page.value = "1";
 
-  const refreshP = await refreshCheckouts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshCheckouts();
 };
 
 const startLoading = () => {
@@ -318,7 +304,10 @@ const refreshCheckouts = async () => {
     return true;
   } catch (error) {
     console.log("error get checkouts=", error);
+  } finally {
+    pre_loader.value = false;
   }
+
   return false;
 };
 
@@ -340,11 +329,7 @@ onMounted(async () => {
   page.value = "1";
   search.value = "";
 
-  const refreshP = await refreshCheckouts();
-
-  if (refreshP) {
-    pre_loader.value = false;
-  }
+  await refreshCheckouts();
 });
 
 watch(searchValue, () => {

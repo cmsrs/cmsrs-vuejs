@@ -145,6 +145,30 @@ describe("Contacts page", () => {
       await screen.findByText(message2);
     });
 
+    it("stops the loader when loading contacts fails", async () => {
+      const consoleLog = vi.spyOn(console, "log").mockImplementation(() => {});
+
+      server.use(
+        http.get(
+          "/api" + apiSecret + "/contacts/pagination/created_at/desc",
+          () => HttpResponse.json({ message: "Server error" }, { status: 500 }),
+        ),
+      );
+
+      try {
+        await setup();
+        const spinner = await screen.findByRole("pre_loader_search_contact");
+        await waitForElementToBeRemoved(spinner);
+
+        expect(
+          screen.queryByRole("pre_loader_search_contact"),
+        ).not.toBeInTheDocument();
+        expect(consoleLog).toHaveBeenCalled();
+      } finally {
+        consoleLog.mockRestore();
+      }
+    });
+
     it("sorting asc by email", async () => {
       await setup();
       await waitForAjax();

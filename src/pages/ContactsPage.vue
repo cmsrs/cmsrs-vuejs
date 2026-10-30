@@ -154,11 +154,7 @@ const searchContacts = async () => {
   page.value = "1";
   search.value = searchValue.value;
 
-  const refreshC = await refreshContacts();
-
-  if (refreshC) {
-    pre_loader.value = false;
-  }
+  await refreshContacts();
 };
 
 const delContact = async (id) => {
@@ -187,11 +183,7 @@ const changePageByUrl = async (url) => {
   pre_loader.value = true;
   page.value = functions.retrieveParamsFromUrl(url, "page");
 
-  const refreshC = await refreshContacts();
-
-  if (refreshC) {
-    pre_loader.value = false;
-  }
+  await refreshContacts();
 };
 
 const sortingAsc = async (column) => {
@@ -208,11 +200,7 @@ const sorting = async (col, dir) => {
   direction.value = dir;
   page.value = "1";
 
-  const refreshC = await refreshContacts();
-
-  if (refreshC) {
-    pre_loader.value = false;
-  }
+  await refreshContacts();
 };
 
 const clearMsg = () => {
@@ -234,6 +222,8 @@ const refreshContacts = async () => {
     return true;
   } catch (error) {
     console.log("error get contacts=", error);
+  } finally {
+    pre_loader.value = false;
   }
   return false;
 };
@@ -252,10 +242,6 @@ onMounted(async () => {
   page.value = "1";
   search.value = "";
 
-  const refreshC = await refreshContacts();
-
-  if (refreshC) {
-    pre_loader.value = false;
-  }
+  await refreshContacts();
 });
 </script>
