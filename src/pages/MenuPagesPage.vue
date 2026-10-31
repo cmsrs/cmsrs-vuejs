@@ -377,53 +377,15 @@
               </div>
             </div>
 
-            <div class="form-group mt-3" data-testid="page-tag-assignment">
-              <label for="pageTagSelect" class="text-secondary"
-                >Tags for this page:</label
-              >
-              <select
-                id="pageTagSelect"
-                class="rs-select form-control"
-                role="page_tag_select"
-                v-model="tagToAdd"
-                :disabled="pre_loader || availablePageTags.length === 0"
-                @change="addPageTag"
-              >
-                <option value=""></option>
-                <option
-                  v-for="tag in availablePageTags"
-                  :key="tag.id"
-                  :value="String(tag.id)"
-                >
-                  {{
-                    tag.name?.[lang] || tag.name?.[configDefaultLang] || tag.id
-                  }}
-                </option>
-              </select>
-              <div class="mt-2" data-testid="assigned-page-tags">
-                <div
-                  v-for="tagId in selectedPageTagIds"
-                  :key="tagId"
-                  class="d-flex align-items-center mb-1"
-                  :data-assigned-tag-id="tagId"
-                >
-                  <span class="me-2">{{ getPageTagName(tagId) }}</span>
-                  <div
-                    role="del_page_tag"
-                    class="trash"
-                    :class="{ 'disabled-if-loader': pre_loader }"
-                    :aria-label="`Remove ${getPageTagName(tagId)}`"
-                    @click="removePageTag(tagId)"
-                  >
-                    <i
-                      class="fas fa-trash cursor-pointer"
-                      :title="`Remove ${getPageTagName(tagId)}`"
-                      aria-hidden="true"
-                    ></i>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <TagAssignment
+              v-model="selectedPageTagIds"
+              :tags="pageTags"
+              :lang="lang"
+              :defaultLang="configDefaultLang"
+              :disabled="pre_loader"
+              entity="page"
+              @remove-tag="removePageTag"
+            />
 
             <div class="mt-4">
               <div
@@ -476,7 +438,7 @@
   </div>
 </template>
 <script setup>
-import { computed, ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import functions from "../helpers/functions.js";
 import cms from "../helpers/cms.js";
@@ -504,6 +466,7 @@ import PageTitle from "../components/PageTitle.vue";
 import Msg from "../components/Msg.vue";
 import ChangeLang from "../components/ChangeLang.vue";
 import ManageImages from "../components/ManageImages.vue";
+import TagAssignment from "../components/TagAssignment.vue";
 
 import { useAuthStore } from "../state/store.js";
 
@@ -534,7 +497,6 @@ const pagesBelongsToPages = ref([]);
 //tags
 const pageTags = ref([]);
 const selectedPageTagIds = ref([]);
-const tagToAdd = ref("");
 
 const title = ref({});
 const short_title = ref({});
@@ -560,9 +522,6 @@ const editorConfig = ref({});
 
 editor.value = ClassicEditor;
 const ckeditor = CKEditor.component;
-
-// Computed
-//const SERVER_URL = computed(() => SERVER_URL);
 
 const saveEditPage = async () => {
   if (!startLoading()) {
@@ -631,7 +590,6 @@ const clearDataPage = () => {
   page_id.value = "";
   images.value = [];
   selectedPageTagIds.value = [];
-  tagToAdd.value = "";
 
   currentPageId.value = false;
 
@@ -818,7 +776,6 @@ const getPageById = async (pageId) => {
       page_id.value = p.page_id;
       images.value = p.images;
       selectedPageTagIds.value = (p.tags || []).map(Number);
-      tagToAdd.value = "";
 
       await childImageComponentRef.value.resetSelectedItems();
 
@@ -957,41 +914,7 @@ const refreshPageTags = async (finishLoading = true) => {
   return false;
 };
 
-const availablePageTags = computed(() =>
-  pageTags.value.filter(
-    (tag) => !selectedPageTagIds.value.includes(Number(tag.id)),
-  ),
-);
-
-const getPageTagName = (tagId) => {
-  const tag = pageTags.value.find((item) => item.id === tagId);
-
-  return (
-    tag?.name?.[lang.value] || tag?.name?.[configDefaultLang] || String(tagId)
-  );
-};
-
-const addPageTag = () => {
-  const tagId = Number(tagToAdd.value);
-
-  if (
-    tagToAdd.value !== "" &&
-    Number.isInteger(tagId) &&
-    !selectedPageTagIds.value.includes(tagId)
-  ) {
-    selectedPageTagIds.value.push(tagId);
-  }
-
-  tagToAdd.value = "";
-};
-
 const removePageTag = async (tagId) => {
-  if (
-    !window.confirm(`Remove tag "${getPageTagName(tagId)}" from this page?`)
-  ) {
-    return;
-  }
-
   const remainingTagIds = selectedPageTagIds.value.filter((id) => id !== tagId);
 
   // A page being created has no server ID yet, so its tag changes are saved

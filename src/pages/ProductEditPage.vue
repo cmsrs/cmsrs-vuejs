@@ -99,53 +99,15 @@
             </select>
           </div>
 
-          <div class="form-group mt-3" data-testid="product-tag-assignment">
-            <label for="productTagSelect" class="text-secondary"
-              >Tags for this product:</label
-            >
-            <select
-              id="productTagSelect"
-              class="rs-select form-control"
-              role="product_tag_select"
-              v-model="tagToAdd"
-              :disabled="pre_loader || availableProductTags.length === 0"
-              @change="addProductTag"
-            >
-              <option value=""></option>
-              <option
-                v-for="tag in availableProductTags"
-                :key="tag.id"
-                :value="String(tag.id)"
-              >
-                {{
-                  tag.name?.[lang] || tag.name?.[configDefaultLang] || tag.id
-                }}
-              </option>
-            </select>
-            <div class="mt-2" data-testid="assigned-product-tags">
-              <div
-                v-for="tagId in selectedProductTagIds"
-                :key="tagId"
-                class="d-flex align-items-center mb-1"
-                :data-assigned-tag-id="tagId"
-              >
-                <span class="me-2">{{ getProductTagName(tagId) }}</span>
-                <div
-                  role="del_product_tag"
-                  class="trash"
-                  :class="{ 'disabled-if-loader': pre_loader }"
-                  :aria-label="`Remove ${getProductTagName(tagId)}`"
-                  @click="removeProductTag(tagId)"
-                >
-                  <i
-                    class="fas fa-trash cursor-pointer"
-                    :title="`Remove ${getProductTagName(tagId)}`"
-                    aria-hidden="true"
-                  ></i>
-                </div>
-              </div>
-            </div>
-          </div>
+          <TagAssignment
+            v-model="selectedProductTagIds"
+            :tags="productTags"
+            :lang="lang"
+            :defaultLang="configDefaultLang"
+            :disabled="pre_loader"
+            entity="product"
+            @remove-tag="removeProductTag"
+          />
 
           <!-- manage image -->
           <ManageImages
@@ -183,7 +145,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, onMounted, computed } from "vue";
+import { ref, watch, onMounted } from "vue";
 import functions from "../helpers/functions.js";
 import trans from "../helpers/trans.js";
 import { handleError } from "../helpers/common.js";
@@ -198,6 +160,7 @@ import {
 import Msg from "../components/Msg.vue";
 import ChangeLang from "../components/ChangeLang.vue";
 import ManageImages from "../components/ManageImages.vue";
+import TagAssignment from "../components/TagAssignment.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../state/store.js";
 const { auth, config, setDefaultLang } = useAuthStore();
@@ -220,7 +183,6 @@ const pre_loader = ref(false);
 const shopPages = ref([]);
 const productTags = ref([]);
 const selectedProductTagIds = ref([]);
-const tagToAdd = ref("");
 
 //form data - start
 const currentProductId = ref(false);
@@ -319,7 +281,6 @@ const loadProduct = async (id) => {
       page_id.value = productData.page_id;
       images.value = productData.images;
       selectedProductTagIds.value = (productData.tags || []).map(Number);
-      tagToAdd.value = "";
       return true;
     } else {
       msgWrong.value = "Sth wrong with get product";
@@ -348,39 +309,7 @@ const refreshProductTags = async () => {
   return false;
 };
 
-const availableProductTags = computed(() =>
-  productTags.value.filter(
-    (tag) => !selectedProductTagIds.value.includes(Number(tag.id)),
-  ),
-);
-
-const getProductTagName = (tagId) => {
-  const tag = productTags.value.find((item) => item.id === tagId);
-  return (
-    tag?.name?.[lang.value] || tag?.name?.[configDefaultLang] || String(tagId)
-  );
-};
-
-const addProductTag = () => {
-  const tagId = Number(tagToAdd.value);
-  if (
-    tagToAdd.value !== "" &&
-    Number.isInteger(tagId) &&
-    !selectedProductTagIds.value.includes(tagId)
-  ) {
-    selectedProductTagIds.value.push(tagId);
-  }
-  tagToAdd.value = "";
-};
-
 const removeProductTag = async (tagId) => {
-  const confirmed = window.confirm(
-    `Remove tag "${getProductTagName(tagId)}" from this product?`,
-  );
-  if (!confirmed) {
-    return;
-  }
-
   const remainingTagIds = selectedProductTagIds.value.filter(
     (id) => id !== tagId,
   );
