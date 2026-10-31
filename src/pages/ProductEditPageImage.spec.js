@@ -111,6 +111,16 @@ const responsePagesTypeShop = {
 };
 
 let server = setupServer(
+  http.get("/api" + apiSecret + "/tag-categories", () => {
+    return HttpResponse.json({
+      success: true,
+      data: {
+        product: [],
+        page: [],
+      },
+    });
+  }),
+
   http.get("/api" + apiSecret + "/pages/type/shop", () => {
     counter += 1;
     return HttpResponse.json(responsePagesTypeShop);
