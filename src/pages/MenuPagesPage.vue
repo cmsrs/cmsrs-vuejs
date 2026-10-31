@@ -817,9 +817,7 @@ const getPageById = async (pageId) => {
       menu_id.value = p.menu_id;
       page_id.value = p.page_id;
       images.value = p.images;
-      selectedPageTagIds.value = (p.tags || []).map((tag) =>
-        Number(typeof tag === "object" ? tag.id : tag),
-      );
+      selectedPageTagIds.value = (p.tags || []).map(Number);
       tagToAdd.value = "";
 
       await childImageComponentRef.value.resetSelectedItems();

@@ -50,6 +50,13 @@ export const putPageTags = (tags, id, token) => {
   );
 };
 
+export const putProductTags = (tags, id, token) => {
+  return axios.put(
+    "/api" + apiSecret + "/products/" + id + "/tags?token=" + token,
+    { tags },
+  );
+};
+
 export const getPages = (token) => {
   return axios.get("/api" + apiSecret + "/pages?token=" + token);
 };

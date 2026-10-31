@@ -40,6 +40,7 @@ const responseGetProduct = {
       pl: "php3 app bazodanowe",
     },
     product_name_default_lang: "php3 db app_1",
+    tags: [91],
     images: [
       {
         id: 1,
@@ -110,7 +111,37 @@ const responsePagesTypeShop = {
   ],
 };
 
+const productTagCategories = {
+  success: true,
+  data: {
+    product: [
+      {
+        id: 10,
+        name: { en: "Product category", pl: "Kategoria produktu" },
+        tags: [
+          { id: 91, name: { en: "Product tag", pl: "Tag produktu" } },
+          { id: 92, name: { en: "Other product tag", pl: "Inny tag" } },
+        ],
+      },
+    ],
+    page: [
+      {
+        id: 11,
+        name: { en: "Page category", pl: "Kategoria strony" },
+        tags: [{ id: 93, name: { en: "Page tag", pl: "Tag strony" } }],
+      },
+    ],
+  },
+};
+
+let lastProductUpdate = null;
+let lastProductTagsUpdate = null;
+
 let server = setupServer(
+  http.get("/api" + apiSecret + "/tag-categories", () => {
+    return HttpResponse.json(productTagCategories);
+  }),
+
   http.get("/api" + apiSecret + "/pages/type/shop", () => {
     counter += 1;
     return HttpResponse.json(responsePagesTypeShop);
@@ -121,15 +152,22 @@ let server = setupServer(
     return HttpResponse.json(responseGetProduct);
   }),
 
-  http.put("/api" + apiSecret + "/products/1", () => {
+  http.put("/api" + apiSecret + "/products/1", async ({ request }) => {
     counter += 1;
+    lastProductUpdate = await request.json();
     return HttpResponse.json({
       success: true,
     });
   }),
 
-  http.post("/api" + apiSecret + "/products", () => {
+  http.put("/api" + apiSecret + "/products/1/tags", async ({ request }) => {
+    lastProductTagsUpdate = await request.json();
+    return HttpResponse.json({ success: true });
+  }),
+
+  http.post("/api" + apiSecret + "/products", async ({ request }) => {
     counter += 1;
+    lastProductUpdate = await request.json();
     return HttpResponse.json({
       success: true,
       data: {
@@ -148,6 +186,8 @@ beforeAll(() => {
 
 beforeEach(() => {
   counter = 0;
+  lastProductUpdate = null;
+  lastProductTagsUpdate = null;
   server.resetHandlers();
 });
 
@@ -255,6 +295,15 @@ describe("Product edit or add page", () => {
       expect(productDescription).toHaveValue(
         responseGetProduct.data.product_description["en"],
       );
+
+      const assignedTags = screen.getByTestId("assigned-product-tags");
+      expect(assignedTags).toHaveTextContent("Product tag");
+      expect(screen.getByRole("product_tag_select")).toHaveTextContent(
+        "Other product tag",
+      );
+      expect(screen.getByRole("product_tag_select")).not.toHaveTextContent(
+        "Page tag",
+      );
     });
 
     it("load add product", async () => {
@@ -291,6 +340,7 @@ describe("Product edit or add page", () => {
       const buttonSubmit = screen.queryByRole("button_save_edit_product");
       await userEvent.click(buttonSubmit);
       expect(counter).toBe(3);
+      expect(lastProductUpdate.tags).toEqual([91]);
 
       const successMsg = trans.ttt("success_product_edit");
       expect(successMsg).not.toBe("");
@@ -319,9 +369,18 @@ describe("Product edit or add page", () => {
       );
       await userEvent.type(productDescription, "323");
 
+      await userEvent.selectOptions(
+        screen.getByRole("product_tag_select"),
+        "92",
+      );
+      expect(screen.getByTestId("assigned-product-tags")).toHaveTextContent(
+        "Other product tag",
+      );
+
       const buttonSubmit = screen.queryByRole("button_save_edit_product");
       await userEvent.click(buttonSubmit);
       expect(counter).toBe(2);
+      expect(lastProductUpdate.tags).toEqual([92]);
 
       expect(router.currentRoute.value.path).toBe("/product/edit/1");
       const header = screen.queryByRole("heading", { name: "Edit product" });
@@ -330,6 +389,47 @@ describe("Product edit or add page", () => {
       const successMsg = trans.ttt("success_product_add");
       expect(successMsg).not.toBe("");
       await screen.findByText(successMsg);
+    });
+
+    it("removes an existing product tag after confirmation", async () => {
+      await setupEdit();
+      await waitForAjax();
+      expect(screen.getByTestId("assigned-product-tags")).toHaveTextContent(
+        "Product tag",
+      );
+
+      confirmSpy.mockReturnValueOnce(true);
+      await userEvent.click(
+        screen
+          .getByTestId("assigned-product-tags")
+          .querySelector(
+            '[data-assigned-tag-id="91"] [role="del_product_tag"]',
+          ),
+      );
+
+      await waitFor(() => expect(lastProductTagsUpdate).toEqual({ tags: [] }));
+      expect(screen.getByTestId("assigned-product-tags")).not.toHaveTextContent(
+        "Product tag",
+      );
+    });
+
+    it("keeps an existing product tag when deletion is cancelled", async () => {
+      await setupEdit();
+      await waitForAjax();
+
+      confirmSpy.mockReturnValueOnce(false);
+      await userEvent.click(
+        screen
+          .getByTestId("assigned-product-tags")
+          .querySelector(
+            '[data-assigned-tag-id="91"] [role="del_product_tag"]',
+          ),
+      );
+
+      expect(lastProductTagsUpdate).toBeNull();
+      expect(screen.getByTestId("assigned-product-tags")).toHaveTextContent(
+        "Product tag",
+      );
     });
   });
 

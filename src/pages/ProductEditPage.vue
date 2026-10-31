@@ -99,6 +99,54 @@
             </select>
           </div>
 
+          <div class="form-group mt-3" data-testid="product-tag-assignment">
+            <label for="productTagSelect" class="text-secondary"
+              >Tags for this product:</label
+            >
+            <select
+              id="productTagSelect"
+              class="rs-select form-control"
+              role="product_tag_select"
+              v-model="tagToAdd"
+              :disabled="pre_loader || availableProductTags.length === 0"
+              @change="addProductTag"
+            >
+              <option value=""></option>
+              <option
+                v-for="tag in availableProductTags"
+                :key="tag.id"
+                :value="String(tag.id)"
+              >
+                {{
+                  tag.name?.[lang] || tag.name?.[configDefaultLang] || tag.id
+                }}
+              </option>
+            </select>
+            <div class="mt-2" data-testid="assigned-product-tags">
+              <div
+                v-for="tagId in selectedProductTagIds"
+                :key="tagId"
+                class="d-flex align-items-center mb-1"
+                :data-assigned-tag-id="tagId"
+              >
+                <span class="me-2">{{ getProductTagName(tagId) }}</span>
+                <div
+                  role="del_product_tag"
+                  class="trash"
+                  :class="{ 'disabled-if-loader': pre_loader }"
+                  :aria-label="`Remove ${getProductTagName(tagId)}`"
+                  @click="removeProductTag(tagId)"
+                >
+                  <i
+                    class="fas fa-trash cursor-pointer"
+                    :title="`Remove ${getProductTagName(tagId)}`"
+                    aria-hidden="true"
+                  ></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- manage image -->
           <ManageImages
             ref="childImageComponentRef"
@@ -135,7 +183,7 @@
   </div>
 </template>
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, computed } from "vue";
 import functions from "../helpers/functions.js";
 import trans from "../helpers/trans.js";
 import { handleError } from "../helpers/common.js";
@@ -144,6 +192,8 @@ import {
   postProduct,
   putProduct,
   getPagesByType,
+  getTagCategories,
+  putProductTags,
 } from "../api/apiCalls.js";
 import Msg from "../components/Msg.vue";
 import ChangeLang from "../components/ChangeLang.vue";
@@ -168,6 +218,9 @@ const errFields = ref([]);
 
 const pre_loader = ref(false);
 const shopPages = ref([]);
+const productTags = ref([]);
+const selectedProductTagIds = ref([]);
+const tagToAdd = ref("");
 
 //form data - start
 const currentProductId = ref(false);
@@ -224,6 +277,7 @@ const addEditProduct = async () => {
       product_description: product_description.value,
       page_id: page_id.value,
       images: images.value,
+      tags: selectedProductTagIds.value.map(Number),
     };
 
     const retProduct = product.id //product.value.id
@@ -264,7 +318,8 @@ const loadProduct = async (id) => {
       product_description.value = productData.product_description; //[lang.value];
       page_id.value = productData.page_id;
       images.value = productData.images;
-
+      selectedProductTagIds.value = (productData.tags || []).map(Number);
+      tagToAdd.value = "";
       return true;
     } else {
       msgWrong.value = "Sth wrong with get product";
@@ -275,6 +330,86 @@ const loadProduct = async (id) => {
     console.log("error get product=", error);
   }
   return false;
+};
+
+const refreshProductTags = async () => {
+  try {
+    const response = await getTagCategories(auth.token);
+    if (response.data.success) {
+      productTags.value = (response.data.data?.product || []).flatMap(
+        (category) =>
+          (category.tags || []).map((tag) => ({ ...tag, id: Number(tag.id) })),
+      );
+      return true;
+    }
+  } catch (error) {
+    console.log("error get product tags=", error);
+  }
+  return false;
+};
+
+const availableProductTags = computed(() =>
+  productTags.value.filter(
+    (tag) => !selectedProductTagIds.value.includes(Number(tag.id)),
+  ),
+);
+
+const getProductTagName = (tagId) => {
+  const tag = productTags.value.find((item) => item.id === tagId);
+  return (
+    tag?.name?.[lang.value] || tag?.name?.[configDefaultLang] || String(tagId)
+  );
+};
+
+const addProductTag = () => {
+  const tagId = Number(tagToAdd.value);
+  if (
+    tagToAdd.value !== "" &&
+    Number.isInteger(tagId) &&
+    !selectedProductTagIds.value.includes(tagId)
+  ) {
+    selectedProductTagIds.value.push(tagId);
+  }
+  tagToAdd.value = "";
+};
+
+const removeProductTag = async (tagId) => {
+  const confirmed = window.confirm(
+    `Remove tag "${getProductTagName(tagId)}" from this product?`,
+  );
+  if (!confirmed) {
+    return;
+  }
+
+  const remainingTagIds = selectedProductTagIds.value.filter(
+    (id) => id !== tagId,
+  );
+
+  if (!currentProductId.value) {
+    selectedProductTagIds.value = remainingTagIds;
+    return;
+  }
+
+  if (!startLoading()) {
+    return;
+  }
+
+  try {
+    const response = await putProductTags(
+      remainingTagIds,
+      currentProductId.value,
+      auth.token,
+    );
+    if (response.data.success) {
+      selectedProductTagIds.value = remainingTagIds;
+    } else {
+      msgWrong.value = functions.parseError(response.data.error);
+    }
+  } catch (error) {
+    handleError(error, config.demo_status, msgWrong, pre_loader);
+  } finally {
+    pre_loader.value = false;
+  }
 };
 
 const getShopPages = async () => {
@@ -315,6 +450,7 @@ onMounted(async () => {
 
   await childImageComponentRef.value.resetSelectedItems();
   await getShopPages();
+  await refreshProductTags();
 
   if (mode === "edit") {
     const id = router.currentRoute.value.params.id;

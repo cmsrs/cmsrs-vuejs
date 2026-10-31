@@ -286,10 +286,7 @@ let server = setupServer(
   http.get("/api" + apiSecret + "/pages/3", async () => {
     return HttpResponse.json({
       success: true,
-      data: {
-        ...pages[2],
-        tags: [{ id: 42, name: { en: "News" } }],
-      },
+      data: pages[2],
     });
   }),
 
