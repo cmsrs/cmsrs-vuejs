@@ -396,16 +396,12 @@
                   page_type === 'privacy_policy'
                 "
               >
-                <br />
-                <ckeditor
-                  :editor="editor"
+                <CmsRsEditor
+                  :key="String(currentPageId || 'new') + '-' + lang"
                   v-model="content[lang]"
-                  :config="editorConfig"
-                ></ckeditor>
-                <!--
-                    we show contentCKE: CKEditor (for: 'cms', 'inner', 'privacy_policy' )
-                    -->
+                />
               </div>
+
               <div class="form-group" v-else>
                 <textarea
                   class="form-control textarea-rs"
@@ -459,8 +455,9 @@ import {
   deletePage,
   setPagePosition,
 } from "../api/apiCalls";
-import CKEditor from "@ckeditor/ckeditor5-vue";
-import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+//import CKEditor from "@ckeditor/ckeditor5-vue";
+//import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import CmsRsEditor from "../components/CmsRsEditor.vue";
 
 import PageTitle from "../components/PageTitle.vue";
 import Msg from "../components/Msg.vue";
@@ -517,11 +514,11 @@ const menus = ref([]);
 const menus_error_new = ref(false);
 const currentPageId = ref(false);
 
-const editor = ref(ClassicEditor);
-const editorConfig = ref({});
+// const editor = ref(ClassicEditor);
+// const editorConfig = ref({});
 
-editor.value = ClassicEditor;
-const ckeditor = CKEditor.component;
+// editor.value = ClassicEditor;
+// const ckeditor = CKEditor.component;
 
 const saveEditPage = async () => {
   if (!startLoading()) {
