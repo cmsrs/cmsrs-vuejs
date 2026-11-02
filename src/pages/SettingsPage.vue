@@ -29,7 +29,7 @@
             :class="{ 'disabled-if-loader': pre_loader }"
             :disabled="pre_loader"
           >
-            <i class="fa fa-cog" aria-hidden="true"></i>
+            <Icon name="fa-cog" aria-hidden="true" />
             {{ trans.ttt("clear_cache") }}
           </label>
         </div>
@@ -41,7 +41,7 @@
             :class="{ 'disabled-if-loader': pre_loader }"
             :disabled="pre_loader"
           >
-            <i class="fa fa-cog" aria-hidden="true"></i>
+            <Icon name="fa-cog" aria-hidden="true" />
             {{ trans.ttt("create_sitemap") }}
           </label>
         </div>
@@ -51,6 +51,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "../components/Icon.vue";
 import { ref, watch, onMounted } from "vue";
 import {
   postToggleCacheEnableFile,

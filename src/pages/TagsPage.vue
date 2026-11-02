@@ -20,7 +20,7 @@
             :disabled="pre_loader"
             @click.prevent="addCategory"
           >
-            <i class="fas fa-plus"></i>
+            <Icon name="fa-plus" />
             Add category
           </button>
 
@@ -94,24 +94,26 @@
 
                   <!-- Save category -->
                   <div class="col-1">
-                    <i
-                      class="far fa-save cursor-pointer"
+                    <Icon
+                      name="fa-save"
+                      class="cursor-pointer"
                       :class="{ 'disabled-if-loader': pre_loader }"
                       title="Save category"
                       role="button_save_tag_category"
                       @click="saveCategory(category)"
-                    ></i>
+                    />
                   </div>
 
                   <!-- Delete category -->
                   <div class="col-1 trash">
-                    <i
-                      class="fas fa-trash cursor-pointer"
+                    <Icon
+                      name="fa-trash"
+                      class="cursor-pointer"
                       :class="{ 'disabled-if-loader': pre_loader }"
                       title="Delete category"
                       role="button_delete_tag_category"
                       @click="deleteCategory(category)"
-                    ></i>
+                    />
                   </div>
                 </div>
 
@@ -134,19 +136,21 @@
                       :class="{ 'disabled-if-loader': pre_loader }"
                       @click.stop="deleteTag(tag)"
                     >
-                      <i
-                        class="fas fa-trash cursor-pointer"
+                      <Icon
+                        name="fa-trash"
+                        class="cursor-pointer"
                         title="Delete tag"
                         aria-hidden="true"
-                      ></i>
+                      />
                     </div>
 
                     <div class="col-1">
-                      <i
-                        class="far fa-edit cursor-pointer"
+                      <Icon
+                        name="fa-edit"
+                        class="cursor-pointer"
                         title="Edit tag"
                         @click.stop="editTag(tag)"
-                      ></i>
+                      />
                     </div>
 
                     <div class="col-10">
@@ -204,23 +208,27 @@
               </div>
 
               <div class="col-1">
-                <i
-                  class="far fa-save cursor-pointer"
+                <Icon
+                  name="fa-save"
+                  class="cursor-pointer"
                   :class="{ 'disabled-if-loader': pre_loader }"
                   title="Save category"
                   role="button_save_tag_category"
                   @click="saveCategory('new')"
-                ></i>
+                />
               </div>
 
-              <div class="col-1 trash">
-                <i
-                  class="fas fa-trash cursor-pointer"
+              <div
+                class="col-1 trash"
+                role="button_cancel_new_tag_category"
+                @click="cancelAddCategory"
+              >
+                <Icon
+                  name="fa-trash"
+                  class="cursor-pointer"
                   :class="{ 'disabled-if-loader': pre_loader }"
-                  role="button_cancel_new_tag_category"
                   title="Cancel"
-                  @click="cancelAddCategory"
-                ></i>
+                />
               </div>
             </div>
           </div>
@@ -236,10 +244,10 @@
             :disabled="pre_loader"
             @click.prevent="saveTag"
           >
-            <i
+            <Icon
+              :name="currentTagId ? 'fa-save' : 'fa-plus'"
               v-if="!pre_loader"
-              :class="currentTagId ? 'far fa-save' : 'fas fa-plus'"
-            ></i>
+            />
 
             <span v-if="pre_loader" class="spinner-grow spinner-grow-sm"></span>
 
@@ -306,6 +314,7 @@
 </template>
 
 <script setup>
+import Icon from "../components/Icon.vue";
 import { ref, onMounted, watch } from "vue";
 
 import functions from "../helpers/functions.js";

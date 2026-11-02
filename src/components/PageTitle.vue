@@ -7,7 +7,7 @@
         :class="{ 'disabled-if-loader': pre_loader }"
         @click="$emit('execEditPage', p.id)"
       >
-        <i class="far fa-edit cursor-pointer"></i>
+        <Icon name="fa-edit" class="cursor-pointer" />
       </div>
       <div
         role="del_page"
@@ -15,7 +15,7 @@
         :class="{ 'disabled-if-loader': pre_loader }"
         @click="$emit('execDelPage', p.id)"
       >
-        <i class="fas fa-trash cursor-pointer"></i>
+        <Icon name="fa-trash" class="cursor-pointer" />
       </div>
       <div
         role="down_page"
@@ -23,7 +23,7 @@
         class="ml-2 col-1"
         @click="$emit('execPositionPageDown', p.id)"
       >
-        <i class="fas fa-arrow-down cursor-pointer" aria-hidden="true"></i>
+        <Icon name="fa-arrow-down" class="cursor-pointer" aria-hidden="true" />
       </div>
       <div
         role="up_page"
@@ -31,7 +31,7 @@
         class="ml-2 col-1"
         @click="$emit('execPositionPageUp', p.id)"
       >
-        <i class="fas fa-arrow-up cursor-pointer" aria-hidden="true"></i>
+        <Icon name="fa-arrow-up" class="cursor-pointer" aria-hidden="true" />
       </div>
       <span class="col" :class="{ 'text-secondary': !p.published }">
         <span
@@ -53,6 +53,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "./Icon.vue";
 defineProps({
   pre_loader: Boolean,
   p: Object,

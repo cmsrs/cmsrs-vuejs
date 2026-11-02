@@ -36,11 +36,12 @@
           :aria-label="`Remove ${getTagNameById(tagId)}`"
           @click="removeTag(tagId)"
         >
-          <i
-            class="fas fa-trash cursor-pointer"
+          <Icon
+            name="fa-trash"
+            class="cursor-pointer"
             :title="`Remove ${getTagNameById(tagId)}`"
             aria-hidden="true"
-          ></i>
+          />
         </div>
       </div>
     </div>
@@ -48,6 +49,7 @@
 </template>
 
 <script setup>
+import Icon from "./Icon.vue";
 import { computed, ref } from "vue";
 
 const props = defineProps({

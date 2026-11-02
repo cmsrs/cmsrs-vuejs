@@ -28,7 +28,7 @@
             class="add-page-btn btn btn-primary mt-2 mb-2 mr-2"
             :disabled="pre_loader"
           >
-            <i v-if="!pre_loader" class="fas fa-search"></i>
+            <Icon name="fa-search" v-if="!pre_loader" />
             <span
               role="pre_loader_search_checkout"
               v-if="pre_loader"
@@ -132,11 +132,12 @@
                 class="me-1"
                 :class="{ 'disabled-if-loader': pre_loader }"
                 @click="editCheckout(p['id'])"
-                ><i
-                  class="far fa-money-bill-alt cursor-pointer"
+                ><Icon
+                  name="fa-money-bill-alt"
+                  class="cursor-pointer"
                   aria-hidden="true"
-                ></i
-              ></span>
+                />
+              </span>
               <span v-else> Paid </span>
             </td>
           </tr>
@@ -168,6 +169,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "../components/Icon.vue";
 import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import functions from "../helpers/functions.js";

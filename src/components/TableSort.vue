@@ -6,11 +6,12 @@
       class="ml-2 col-1"
       @click.prevent="$emit('sortAsc')"
     >
-      <i
-        class="fas fa-arrow-down cursor-pointer"
+      <Icon
+        name="fa-arrow-down"
+        class="cursor-pointer"
         :class="{ 'text-primary': sortColumn == column && direction == 'asc' }"
         aria-hidden="true"
-      ></i>
+      />
     </span>
     <span
       :role="'sorting_' + sortColumn + '_desc'"
@@ -18,16 +19,18 @@
       class="ml-2 col-1"
       @click.prevent="$emit('sortDesc')"
     >
-      <i
-        class="fas fa-arrow-up cursor-pointer"
+      <Icon
+        name="fa-arrow-up"
+        class="cursor-pointer"
         :class="{ 'text-primary': sortColumn == column && direction == 'desc' }"
         aria-hidden="true"
-      ></i>
+      />
     </span>
   </span>
 </template>
 
 <script setup>
+import Icon from "./Icon.vue";
 defineProps({
   pre_loader: Boolean,
   sortColumn: String,

@@ -129,7 +129,7 @@
             class="add-page-btn btn btn-primary mt-4 mb-2 mr-2"
             :disabled="pre_loader"
           >
-            <i v-if="!pre_loader" class="fas fa-plus"></i>
+            <Icon name="fa-plus" v-if="!pre_loader" />
             <span
               role="pre_loader_add_edit_product"
               v-if="pre_loader"
@@ -145,6 +145,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "../components/Icon.vue";
 import { ref, watch, onMounted } from "vue";
 import functions from "../helpers/functions.js";
 import trans from "../helpers/trans.js";

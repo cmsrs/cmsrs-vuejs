@@ -79,7 +79,7 @@
             class="add-page-btn btn btn-primary mt-2 mb-2 mr-2"
             :disabled="pre_loader"
           >
-            <i v-if="!pre_loader" class="fas fa-plus"></i>
+            <Icon name="fa-plus" v-if="!pre_loader" />
 
             <span
               role="pre_loader_add_edit_client"
@@ -96,6 +96,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "../components/Icon.vue";
 import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import functions from "../helpers/functions.js";

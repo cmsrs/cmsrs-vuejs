@@ -20,7 +20,7 @@
             class="btn btn-primary mt-2 mb-2"
             :disabled="pre_loader"
           >
-            <i v-if="!pre_loader" class="fas fa-plus"></i>
+            <Icon name="fa-plus" v-if="!pre_loader" />
             <span
               role="pre_loader_add_menu"
               v-if="pre_loader"
@@ -47,7 +47,7 @@
                     :class="{ 'disabled-if-loader': pre_loader }"
                     @click="saveMenu(index)"
                   >
-                    <i class="far fa-save cursor-pointer"></i>
+                    <Icon name="fa-save" class="cursor-pointer" />
                   </div>
                   <div
                     role="del_menu"
@@ -55,7 +55,11 @@
                     :class="{ 'disabled-if-loader': pre_loader }"
                     @click="delMenu(index)"
                   >
-                    <i class="fas fa-trash cursor-pointer" aria-hidden="true" />
+                    <Icon
+                      name="fa-trash"
+                      class="cursor-pointer"
+                      aria-hidden="true"
+                    />
                   </div>
 
                   <div
@@ -65,10 +69,11 @@
                     class="ms-2 col-1"
                     @click="positionMenu('down', m.id)"
                   >
-                    <i
-                      class="fas fa-arrow-down cursor-pointer"
+                    <Icon
+                      name="fa-arrow-down"
+                      class="cursor-pointer"
                       aria-hidden="true"
-                    ></i>
+                    />
                   </div>
                   <div
                     v-if="menus.length > 1"
@@ -77,10 +82,11 @@
                     class="ms-2 col-1"
                     @click="positionMenu('up', m.id)"
                   >
-                    <i
-                      class="fas fa-arrow-up cursor-pointer"
+                    <Icon
+                      name="fa-arrow-up"
+                      class="cursor-pointer"
                       aria-hidden="true"
-                    ></i>
+                    />
                   </div>
                 </div>
               </div>
@@ -154,14 +160,18 @@
                 class="ms-2 col-1"
                 @click="saveMenu('new')"
               >
-                <i class="far fa-save cursor-pointer"></i>
+                <Icon name="fa-save" class="cursor-pointer" />
               </div>
               <div
                 role="del_menu_0"
                 class="ms-2 trash col-1"
                 @click="delMenu('new')"
               >
-                <i class="fas fa-trash cursor-pointer" aria-hidden="true" />
+                <Icon
+                  name="fa-trash"
+                  class="cursor-pointer"
+                  aria-hidden="true"
+                />
               </div>
             </div>
           </div>
@@ -217,7 +227,7 @@
             class="add-page-btn btn btn-primary mt-2 mb-2 me-2"
             :disabled="pre_loader"
           >
-            <i v-if="!pre_loader" class="fas fa-plus"></i>
+            <Icon name="fa-plus" v-if="!pre_loader" />
             <span
               role="pre_loader_save_edit_page"
               v-if="pre_loader"
@@ -434,6 +444,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "../components/Icon.vue";
 import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import functions from "../helpers/functions.js";

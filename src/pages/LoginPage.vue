@@ -36,7 +36,7 @@
             class="btn btn-primary mt-2 mb-2"
             :disabled="pre_loader || isDisabled"
           >
-            <i v-if="!pre_loader" class="fas fa-plus"></i>
+            <Icon name="fa-plus" v-if="!pre_loader" />
             <span
               role="pre_loader_login"
               v-if="pre_loader"
@@ -54,6 +54,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "../components/Icon.vue";
 import Msg from "../components/Msg.vue";
 import { ref, computed, reactive, watch, onMounted } from "vue";
 import { login, config } from "../api/apiCalls.js";

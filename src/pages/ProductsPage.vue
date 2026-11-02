@@ -18,7 +18,7 @@
             class="add-page-btn btn btn-primary mt-2 mb-2 mr-2"
             :disabled="pre_loader"
           >
-            <i v-if="!pre_loader" class="fas fa-plus"></i>
+            <Icon name="fa-plus" v-if="!pre_loader" />
 
             <span
               role="pre_loader_add_product"
@@ -44,7 +44,7 @@
             class="add-page-btn btn btn-primary mt-2 mb-2 mr-2"
             :disabled="pre_loader"
           >
-            <i v-if="!pre_loader" class="fas fa-search"></i>
+            <Icon name="fa-search" v-if="!pre_loader" />
             <span
               role="pre_loader_search_product"
               v-if="pre_loader"
@@ -153,7 +153,7 @@
                 />
               </span>
               <span v-else>
-                <i :class="iconClass"></i>
+                <Icon name="fa-camera-retro" :class="iconClass" />
               </span>
             </td>
             <td
@@ -174,16 +174,8 @@
             <td>{{ p["sku"] }}</td>
             <td>{{ p["price"] }}</td>
             <td>
-              <i
-                v-if="p['published']"
-                class="fa fa-check"
-                aria-hidden="true"
-              ></i>
-              <i
-                v-if="!p['published']"
-                class="fa fa-times"
-                aria-hidden="true"
-              ></i>
+              <Icon name="fa-check" v-if="p['published']" aria-hidden="true" />
+              <Icon name="fa-times" v-if="!p['published']" aria-hidden="true" />
             </td>
             <td>{{ p["created_at"] ? p["created_at"].split("T")[0] : "" }}</td>
             <td>
@@ -192,15 +184,15 @@
                 class="me-1"
                 :class="{ 'disabled-if-loader': pre_loader }"
                 @click="editProduct(p['id'])"
-                ><i class="far fa-edit cursor-pointer"></i
-              ></span>
+                ><Icon name="fa-edit" class="cursor-pointer" />
+              </span>
               <span
                 role="del_product"
                 class="ms-1"
                 :class="{ 'disabled-if-loader': pre_loader }"
                 @click="delProduct(p['id'])"
-                ><i class="fas fa-trash cursor-pointer"></i
-              ></span>
+                ><Icon name="fa-trash" class="cursor-pointer" />
+              </span>
             </td>
           </tr>
         </tbody>
@@ -231,6 +223,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "../components/Icon.vue";
 import { ref, computed, onMounted } from "vue";
 import { SERVER_URL } from "../config.js";
 import { useRouter } from "vue-router";
@@ -277,9 +270,7 @@ const updateWindowWidth = () => {
 };
 
 const iconClass = computed(() => {
-  return windowWidth.value < 990
-    ? "fa fa-camera-retro fa-lg"
-    : "fa fa-camera-retro fa-3x";
+  return windowWidth.value < 990 ? "fa-lg" : "fa-3x";
 });
 
 const addProduct = () => {

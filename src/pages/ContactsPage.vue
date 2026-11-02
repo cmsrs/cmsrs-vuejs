@@ -23,7 +23,7 @@
             class="add-page-btn btn btn-primary mt-2 mb-2 mr-2"
             :disabled="pre_loader"
           >
-            <i v-if="!pre_loader" class="fas fa-search"></i>
+            <Icon name="fa-search" v-if="!pre_loader" />
             <span
               role="pre_loader_search_contact"
               v-if="pre_loader"
@@ -89,8 +89,8 @@
                 class="ms-1"
                 :class="{ 'disabled-if-loader': pre_loader }"
                 @click="delContact(c['id'])"
-                ><i class="fas fa-trash cursor-pointer"></i
-              ></span>
+                ><Icon name="fa-trash" class="cursor-pointer" />
+              </span>
             </td>
           </tr>
         </tbody>
@@ -121,6 +121,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "../components/Icon.vue";
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import functions from "../helpers/functions.js";

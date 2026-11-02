@@ -21,7 +21,7 @@
           v-if="internalPreLoader"
           class="spinner-grow spinner-grow-sm"
         ></span>
-        <i v-if="!internalPreLoader" class="fas fa-upload"></i>Upload Images
+        <Icon name="fa-upload" v-if="!internalPreLoader" />Upload Images
       </label>
     </div>
 
@@ -38,7 +38,7 @@
         :disabled="internalPreLoader || !currentId"
         @click="deleteImages"
       >
-        <i class="fas fa-trash cursor-pointer" aria-hidden="true"></i>
+        <Icon name="fa-trash" class="cursor-pointer" aria-hidden="true" />
       </div>
     </div>
 
@@ -78,7 +78,7 @@
       :class="{ 'disabled-if-loader': internalPreLoader }"
       @click="delImage(image.id)"
     >
-      <i class="fas fa-trash cursor-pointer" aria-hidden="true"></i>
+      <Icon name="fa-trash" class="cursor-pointer" aria-hidden="true" />
     </div>
 
     <div
@@ -87,7 +87,7 @@
       class="col-1"
       @click="positionImage('down', image.id)"
     >
-      <i class="fas fa-arrow-down cursor-pointer" aria-hidden="true"></i>
+      <Icon name="fa-arrow-down" class="cursor-pointer" aria-hidden="true" />
     </div>
 
     <div
@@ -96,7 +96,7 @@
       class="col-1"
       @click="positionImage('up', image.id)"
     >
-      <i class="fas fa-arrow-up cursor-pointer" aria-hidden="true"></i>
+      <Icon name="fa-arrow-up" class="cursor-pointer" aria-hidden="true" />
     </div>
 
     <div class="form-group col-2">
@@ -115,6 +115,7 @@
   </div>
 </template>
 <script setup>
+import Icon from "./Icon.vue";
 import { ref } from "vue";
 import { SERVER_URL } from "../config.js";
 import imgs from "../helpers/imgs.js";
