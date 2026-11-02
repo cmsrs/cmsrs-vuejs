@@ -33,7 +33,7 @@
     "@testing-library/user-event": "^14.6.8",
     "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^6.0.10",
-    "@vitest/coverage-istanbul": "^5.0.5",
+    "@vitest/coverage-istanbul": "^5.1.0",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/test-utils": "^2.5.1",
     "eslint": "^10.14.0",
@@ -43,6 +43,6 @@
     "msw": "^3.0.3",
     "prettier": "^3.9.10",
     "vite": "^8.3.5",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   }
 }
