@@ -15,8 +15,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-build-classic": "^41.4.2",
-    "@ckeditor/ckeditor5-vue": "^5.1.0",
+    "@tiptap/pm": "^3.32.2",
+    "@tiptap/starter-kit": "^3.32.2",
+    "@tiptap/vue-3": "^3.32.2",
     "axios": "^1.21.0",
     "bootstrap": "^5.3.8",
     "pinia": "^4.1.0",
