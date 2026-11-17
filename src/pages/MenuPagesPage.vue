@@ -797,7 +797,7 @@ const getPageById = async (pageId) => {
       title.value = p.title;
       short_title.value = p.short_title;
       url_slug.value = p.url_slug;
-      h1.value = p.value;
+      h1.value = p.h1;
       description.value = p.description;
       page_type.value = p.type; //!
       content.value = p.content[lang.value]
