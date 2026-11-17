@@ -264,6 +264,24 @@
               />
             </div>
 
+            <div class="form-group mt-3" v-if="page_type !== 'main_page'">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errFields.includes('url_slug') }"
+                v-model="url_slug[lang]"
+                :placeholder="`url slug ${lang}`"
+              />
+            </div>
+
+            <div class="form-group mt-3">
+              <input
+                class="form-control"
+                :class="{ 'is-invalid': errFields.includes('h1') }"
+                v-model="h1[lang]"
+                :placeholder="`h1 ${lang}`"
+              />
+            </div>
+
             <div class="form-group mt-3">
               <textarea
                 class="form-control"
@@ -508,6 +526,8 @@ const selectedPageTagIds = ref([]);
 
 const title = ref({});
 const short_title = ref({});
+const url_slug = ref({});
+const h1 = ref({});
 const description = ref({});
 const content = ref({});
 const page_type = ref("cms");
@@ -540,6 +560,8 @@ const saveEditPage = async () => {
     const post = {
       title: title.value,
       short_title: short_title.value,
+      url_slug: url_slug.value,      
+      h1: h1.value,
       description: description.value,
       type: page_type.value,
       content: content.value,
@@ -588,6 +610,9 @@ const clearDataPage = () => {
 
   title.value = {};
   short_title.value = {};
+  url_slug.value = {};
+  h1.value = {};
+
   description.value = {};
   content.value = {};
   page_type.value = "cms";
@@ -771,6 +796,8 @@ const getPageById = async (pageId) => {
       ); //p.menu_id ? getRootPages(p.menu_id) : [];
       title.value = p.title;
       short_title.value = p.short_title;
+      url_slug.value = p.url_slug;
+      h1.value = p.value;
       description.value = p.description;
       page_type.value = p.type; //!
       content.value = p.content[lang.value]

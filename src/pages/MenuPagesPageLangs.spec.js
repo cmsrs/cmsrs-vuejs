@@ -38,6 +38,12 @@ const pages = [
       pl: "short p22 pl",
       en: "short p22 en",
     },
+    url_slug: {
+      en: "url-slug",
+    },
+    h1: {
+      en: "h1_123",
+    },
     description: {
       pl: "test1234 pl",
       en: "test1234 en",

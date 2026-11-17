@@ -75,6 +75,12 @@ const pages = [
     short_title: {
       en: "p22",
     },
+    url_slug: {
+      en: "url-slug",
+    },
+    h1: {
+      en: "h1_123",
+    },
     description: {
       en: "test1234",
     },
@@ -98,6 +104,12 @@ const pages = [
     short_title: {
       en: "inner p22",
     },
+    url_slug: {
+      en: "url-slug",
+    },
+    h1: {
+      en: "h1_123",
+    },
     description: {
       en: "inner test1234",
     },
@@ -120,6 +132,12 @@ const pages = [
     },
     short_title: {
       en: "cms p333",
+    },
+    url_slug: {
+      en: "url-slug",
+    },
+    h1: {
+      en: "h1_123",
     },
     description: {
       en: "cms test333",
@@ -145,6 +163,12 @@ const pages = [
     short_title: {
       en: "cms p333b",
     },
+    url_slug: {
+      en: "url-slug",
+    },
+    h1: {
+      en: "h1_123",
+    },
     description: {
       en: "cms test333b",
     },
@@ -166,6 +190,12 @@ const pages = [
     },
     short_title: {
       en: "inner p44",
+    },
+    url_slug: {
+      en: "url-slug",
+    },
+    h1: {
+      en: "h1_123",
     },
     description: {
       en: "inner test44",
@@ -189,6 +219,12 @@ const pages = [
     short_title: {
       en: "cms p333c - nestle1",
     },
+    url_slug: {
+      en: "url-slug",
+    },
+    h1: {
+      en: "h1_123",
+    },
     description: {
       en: "cms test333c - nestle1",
     },
@@ -210,6 +246,12 @@ const pages = [
     },
     short_title: {
       en: "cms p333c - nestle2",
+    },
+    url_slug: {
+      en: "url-slug",
+    },
+    h1: {
+      en: "h1_123",
     },
     description: {
       en: "cms test333c - nestle2",
