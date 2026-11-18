@@ -306,6 +306,14 @@ let server = setupServer(
   http.put("/api" + apiSecret + "/pages/3", async ({ request }) => {
     counter2 += 1;
     lastPageUpdate = await request.json();
+    if (!lastPageUpdate.url_slug?.en || lastPageUpdate.url_slug?.en === " ") {
+      return HttpResponse.json({
+        success: false,
+        error: {
+          "url_slug.en": ["The url_slug.en field is required."],
+        },
+      });
+    }
     return HttpResponse.json({
       success: true,
     });
@@ -845,6 +853,7 @@ describe("Pages page", () => {
       //await waitForElementToBeRemoved(spinnerAfterClick); //todo!!! - in webpack it is working - manual testing required
 
       expect(counter).toBe(1);
+      expect(lastPageCreate.url_slug).toEqual({});
 
       const successMsg = trans.ttt("success_page_add");
       expect(successMsg).not.toBe("");
@@ -882,6 +891,9 @@ describe("Pages page", () => {
       const pageTypeDropdown = screen.queryByLabelText("Page type:");
       await userEvent.selectOptions(pageTypeDropdown, "main_page");
       expect(pages[0]["type"]).toBe("main_page");
+      expect(
+        screen.queryByPlaceholderText("url slug en"),
+      ).not.toBeInTheDocument();
 
       const content = screen.queryByPlaceholderText("content en");
       await userEvent.type(content, pages[0]["content"]["en"]);
@@ -906,6 +918,7 @@ describe("Pages page", () => {
       //expect(spinnerAfterClick).not.toBeNull();
 
       expect(counter).toBe(1);
+      expect(lastPageCreate.url_slug).toEqual({});
 
       await screen.findByText("Pages not related to menu");
 
@@ -917,6 +930,25 @@ describe("Pages page", () => {
       const successMsg = trans.ttt("success_page_add");
       expect(successMsg).not.toBe("");
       await screen.findByText(successMsg);
+    });
+
+    it("shows the server validation error when an edited page has no URL slug", async () => {
+      await setup();
+      await waitForAjaxes();
+
+      const pageThreeRow = screen.getByText("cms p333").closest(".test-page");
+      await userEvent.click(pageThreeRow.querySelector('[role="edit_page"]'));
+
+      const urlSlug = await screen.findByPlaceholderText("url slug en");
+      await userEvent.clear(urlSlug);
+      await userEvent.type(urlSlug, " ");
+      await userEvent.click(screen.getByRole("button_save_edit_page"));
+
+      await screen.findByText(
+        "url_slug.en: The url_slug.en field is required.",
+      );
+      expect(urlSlug).toHaveClass("is-invalid");
+      expect(lastPageUpdate.url_slug.en).toBe(" ");
     });
 
     it("show Inner boxes", async () => {

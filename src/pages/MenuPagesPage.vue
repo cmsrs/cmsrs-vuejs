@@ -267,7 +267,7 @@
             </div>
 
             <div class="form-group mt-3" v-if="page_type !== 'main_page'">
-              <label for="Title" class="text-secondary">url slug:</label>              
+              <label for="Title" class="text-secondary">url slug:</label>
               <input
                 class="form-control"
                 :class="{ 'is-invalid': errFields.includes('url_slug') }"
@@ -277,7 +277,7 @@
             </div>
 
             <div class="form-group mt-3">
-              <label for="Title" class="text-secondary">h1:</label>                            
+              <label for="Title" class="text-secondary">h1:</label>
               <input
                 class="form-control"
                 :class="{ 'is-invalid': errFields.includes('h1') }"
@@ -287,7 +287,7 @@
             </div>
 
             <div class="form-group mt-3">
-              <label for="Title" class="text-secondary">Description:</label>                                          
+              <label for="Title" class="text-secondary">Description:</label>
               <textarea
                 class="form-control"
                 rows="4"
@@ -565,7 +565,7 @@ const saveEditPage = async () => {
     const post = {
       title: title.value,
       short_title: short_title.value,
-      url_slug: url_slug.value,      
+      url_slug: url_slug.value,
       h1: h1.value,
       description: description.value,
       type: page_type.value,
