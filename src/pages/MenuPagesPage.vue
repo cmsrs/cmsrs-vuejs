@@ -247,7 +247,7 @@
 
           <form>
             <div class="form-group mt-3">
-              <label for="Title" class="text-secondary">Title:</label>
+              <label for="Title" class="text-secondary"><span class="text-danger">*</span> Title:</label>
               <input
                 class="form-control"
                 :class="{ 'is-invalid': errFields.includes('title') }"
@@ -257,7 +257,7 @@
             </div>
 
             <div class="form-group mt-3">
-              <label for="Title" class="text-secondary">Short title:</label>
+              <label for="Title" class="text-secondary"><span class="text-danger">*</span> Short title:</label>
               <input
                 class="form-control"
                 :class="{ 'is-invalid': errFields.includes('short_title') }"
@@ -267,7 +267,7 @@
             </div>
 
             <div class="form-group mt-3" v-if="page_type !== 'main_page'">
-              <label for="Title" class="text-secondary">url slug:</label>
+              <label for="Title" class="text-secondary"><span class="text-danger" v-if="currentPageId">*</span> url slug:</label>
               <input
                 class="form-control"
                 :class="{ 'is-invalid': errFields.includes('url_slug') }"
