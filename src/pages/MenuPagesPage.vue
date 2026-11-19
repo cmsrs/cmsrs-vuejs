@@ -247,7 +247,9 @@
 
           <form>
             <div class="form-group mt-3">
-              <label for="Title" class="text-secondary"><span class="text-danger">*</span> Title:</label>
+              <label for="Title" class="text-secondary"
+                ><span class="text-danger">*</span> Title:</label
+              >
               <input
                 class="form-control"
                 :class="{ 'is-invalid': errFields.includes('title') }"
@@ -257,7 +259,9 @@
             </div>
 
             <div class="form-group mt-3">
-              <label for="Title" class="text-secondary"><span class="text-danger">*</span> Short title:</label>
+              <label for="Title" class="text-secondary"
+                ><span class="text-danger">*</span> Short title:</label
+              >
               <input
                 class="form-control"
                 :class="{ 'is-invalid': errFields.includes('short_title') }"
@@ -267,7 +271,10 @@
             </div>
 
             <div class="form-group mt-3" v-if="page_type !== 'main_page'">
-              <label for="Title" class="text-secondary"><span class="text-danger" v-if="currentPageId">*</span> url slug:</label>
+              <label for="Title" class="text-secondary"
+                ><span class="text-danger" v-if="currentPageId">*</span> url
+                slug:</label
+              >
               <input
                 class="form-control"
                 :class="{ 'is-invalid': errFields.includes('url_slug') }"
@@ -346,7 +353,9 @@
             </div>
 
             <div class="form-group mt-3">
-              <label for="pageType" class="text-secondary">Page type:</label>
+              <label for="pageType" class="text-secondary"
+                ><span class="text-danger">*</span> Page type:</label
+              >
               <select
                 :class="{ 'disabled-if-loader': pre_loader }"
                 :disabled="pre_loader"
@@ -590,9 +599,9 @@ const saveEditPage = async () => {
         router.push("/pages/" + pageId);
         msgGood.value = trans.ttt("success_page_add");
       } else {
-        await getPageById(currentPageId.value); //refresh fields especially images.position
         msgGood.value = trans.ttt("success_page_edit");
       }
+      await getPageById(currentPageId.value); //for edit: refresh fields especially images.position; for new: add h1 and url_slug in input (this fields return server if was empty during add page)
     } else if (retPage.data.success === false) {
       msgWrong.value = functions.parseError(retPage.data.error);
       errFields.value = functions.getErrorFields(retPage.data.error);
