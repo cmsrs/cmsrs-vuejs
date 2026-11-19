@@ -303,6 +303,20 @@ let server = setupServer(
     return HttpResponse.json(jsonRes);
   }),
 
+  http.get(`/api${apiSecret}/pages/${newPageId}`, () =>
+    HttpResponse.json({
+      success: true,
+      data: {
+        ...lastPageCreate,
+        id: newPageId,
+        h1: lastPageCreate?.h1 ?? lastPageCreate?.title ?? {},
+        url_slug: lastPageCreate?.url_slug ?? {},
+        images: lastPageCreate?.images ?? [],
+        tags: lastPageCreate?.tags ?? [],
+      },
+    }),
+  ),
+
   http.put("/api" + apiSecret + "/pages/3", async ({ request }) => {
     counter2 += 1;
     lastPageUpdate = await request.json();
@@ -859,7 +873,7 @@ describe("Pages page", () => {
       expect(successMsg).not.toBe("");
       await screen.findByText(successMsg);
     });
-    
+
     it("create main_page", async () => {
       await setup();
       await waitForAjaxes();

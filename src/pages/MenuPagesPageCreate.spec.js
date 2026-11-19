@@ -1,9 +1,4 @@
-import {
-  render,
-  router,
-  screen,
-  waitFor,
-} from "../../test/helper.js";
+import { render, router, screen, waitFor } from "../../test/helper.js";
 import "../../test/afterlogin.js";
 
 import MenuPagesPage from "./MenuPagesPage.vue";
