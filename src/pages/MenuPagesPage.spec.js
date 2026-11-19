@@ -860,6 +860,66 @@ describe("Pages page", () => {
       await screen.findByText(successMsg);
     });
 
+    it("refreshes a new CMS page with the URL slug and h1 returned by the server", async () => {
+      await setup();
+      await waitForAjaxes();
+
+      const createdPage = {
+        id: newPageId,
+        published: 0,
+        commented: 0,
+        after_login: 0,
+        position: 1,
+        type: "cms",
+        menu_id: null,
+        page_id: null,
+        title: { en: "New title" },
+        short_title: { en: "New short title" },
+        h1: { en: "New title" },
+        url_slug: { en: "new-title" },
+        description: { en: "" },
+        content: { en: "" },
+        images: [],
+        tags: [],
+      };
+      let fetchedCreatedPage = false;
+
+      server.use(
+        http.get(`/api${apiSecret}/pages/${newPageId}`, async () => {
+          fetchedCreatedPage = true;
+          return HttpResponse.json({ success: true, data: createdPage });
+        }),
+      );
+
+      await userEvent.type(
+        screen.getByPlaceholderText("title en"),
+        "New title",
+      );
+      await userEvent.type(
+        screen.getByPlaceholderText("short title en"),
+        "New short title",
+      );
+
+      expect(screen.getByLabelText(/Page type:/)).toHaveValue("cms");
+      await userEvent.click(screen.getByRole("button_save_edit_page"));
+
+      await waitFor(() => {
+        expect(fetchedCreatedPage).toBe(true);
+        expect(screen.getByPlaceholderText("url slug en")).toHaveValue(
+          "new-title",
+        );
+        expect(screen.getByPlaceholderText("h1 en")).toHaveValue(
+          "New title",
+        );
+      });
+
+      expect(lastPageCreate.type).toBe("cms");
+      expect(lastPageCreate.title).toEqual({ en: "New title" });
+      expect(lastPageCreate.short_title).toEqual({ en: "New short title" });
+      expect(lastPageCreate.url_slug).toEqual({});
+      expect(lastPageCreate.h1).toEqual({});
+    });
+
     it("create main_page", async () => {
       await setup();
       await waitForAjaxes();
@@ -888,7 +948,7 @@ describe("Pages page", () => {
       const description = screen.queryByPlaceholderText("description en");
       await userEvent.type(description, pages[0]["description"]["en"]);
 
-      const pageTypeDropdown = screen.queryByLabelText("Page type:");
+      const pageTypeDropdown = screen.getByLabelText(/Page type:/);
       await userEvent.selectOptions(pageTypeDropdown, "main_page");
       expect(pages[0]["type"]).toBe("main_page");
       expect(
@@ -1342,7 +1402,7 @@ describe("Pages page", () => {
       //console.log(description);
       expect(description).toHaveValue("");
 
-      const pageTypeDropdown = screen.queryByLabelText("Page type:");
+      const pageTypeDropdown = screen.getByLabelText(/Page type:/);
       expect(pageTypeDropdown).toHaveValue("cms");
 
       //const content = screen.queryByPlaceholderText("content en"); //TODO
@@ -1368,7 +1428,7 @@ describe("Pages page", () => {
         const description = screen.queryByPlaceholderText("description en");
         expect(description).toHaveValue(page.description["en"]);
 
-        const pageTypeDropdown = screen.queryByLabelText("Page type:");
+        const pageTypeDropdown = screen.getByLabelText(/Page type:/);
         expect(pageTypeDropdown).toHaveValue(page.type); //!!
 
         //const content = screen.queryByPlaceholderText("content en"); //TODO
